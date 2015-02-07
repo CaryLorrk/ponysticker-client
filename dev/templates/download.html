@@ -1,0 +1,69 @@
+<ion-view view-title="{{'DOWNLOAD_TITLE_'+download.repo | translate}}">
+    <ion-nav-buttons side="left">
+        <!--Toggle button-->
+        <button class="button button-icon
+            button-clear ion-navicon"
+            menu-toggle="left" >
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <!--Loading icon-->
+        <ion-spinner ng-show="download.isLoading()"></ion-spinner>
+
+        <!--Sort button-->
+        <button class="button button-icon 
+            button-clear ion-funnel"
+            ng-click="download.showSortPopover($event)"></button>
+    </ion-nav-buttons>
+
+    <!--Search bar-->
+    <div class="bar bar-subheader item-input-inset">
+        <label class="item-input-wrapper">
+            <i class="icon ion-search placeholder-icon"></i>
+            <input type="search"
+                ng-model="download.query"
+                ng-keyup="download.searchInField($event)">
+        </label>
+        <button class="button button-balanced"
+            ng-click="download.search()"
+            translate>DOWNLOAD_SEARCH</button>
+    </div>
+
+    <!--Main content-->
+    <ion-content class="has-header has-subheader has-footer">
+        <!--Error and reload-->
+        <div class="text-center"
+            ng-show="download.isLoadingErr()">
+            <span class="text-danger" translate>DOWNLOAD_LOADING_ERROR</span>
+            <div class="button button-block button-calm"
+                ng-click="download.refreshAll()"
+                translate>DOWNLOAD_RELOAD</div>
+        </div>
+
+        <!--Package list-->
+        <div class="list">
+            <a class="item item-thumbnail-left animation-fade"
+                ng-repeat="pkg in download.pkgList"
+                ui-sref="package({repo:download.repo, packageId: pkg.packageId})">
+                <img ng-src="{{download.getTabOnUrl(pkg.packageId)}}" alt="{{pkg.packageId}}">
+                <p>{{pkg.packageId}}</p>
+                <h2>{{download.getTitle(pkg)}}</h2>
+                <p>{{download.getAuthor(pkg)}}</p>
+            </a>
+        </div>
+    </ion-content>
+
+    <!--Footer-->
+    <ion-footer-bar class="bar-positive">
+        <div class="button-bar">
+            <button class="button button-clear"
+                ng-click="download.goPrev()"
+                translate>DOWNLOAD_PREV</button>
+            <button class="button button-clear"
+                ng-click="download.showPageEditor()">{{download.page}}/{{download.getPageCount()}}</button>
+            <button class="button button-clear"
+                ng-click="download.goNext()"
+                translate>DOWNLOAD_NEXT</button>
+        </div>
+    </ion-footer-bar>
+</ion-view>

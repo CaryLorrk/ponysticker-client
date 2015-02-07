@@ -1,0 +1,9 @@
+{
+    "PREFERENCE_TITLE": "偏好設定",
+    "PREFERENCE_EXPORT": "匯出",
+    "PREFERENCE_IMPORT": "匯入",
+    "PREFERENCE_LANGUAGE": "語言",
+    "PREFERENCE_SERVER": "伺服器",
+    "PREFERENCE_PAGE_SIZE": "頁面大小",
+    "PREFERENCE_SPACE": "空間"
+}

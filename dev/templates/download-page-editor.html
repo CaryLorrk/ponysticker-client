@@ -1,0 +1,10 @@
+<input type="number"
+    ng-model="download.pageEditor.newPage"
+    ng-keyup="download.pageEditor.closeInField($event)">
+<p class="text-danger"
+    ng-show="!download.pageEditor.isPositiveInteger()"
+    translate>DOWNLOAD_PAGE_ALERT_POSITIVE_INTEGER</p>
+<p class="text-danger"
+    ng-show="download.pageEditor.isPositiveInteger() &&
+             !download.pageEditor.isInRange()"
+    translate>DOWNLOAD_PAGE_ALERT_OUT_OF_RANGE</p>

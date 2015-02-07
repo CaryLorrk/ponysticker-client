@@ -1,0 +1,21 @@
+<ion-popover-view>
+    <ion-content>
+        <div class="list">
+            <div class="item" 
+                ng-if="!package.favorite"
+                ng-click="package.addFavorite()"
+                translate>
+                PACKAGE_ADD_FAVORITE
+            </div>
+            <div class="item"
+                ng-if="package.favorite"
+                ng-click="package.removeFavorite()"
+                translate>
+                PACKAGE_REMOVE_FAVORITE
+            </div>
+            <div class="item" translate>
+                PACKAGE_SET_TAGS
+            </div>
+        </div>
+    </ion-content>
+</ion-popover-view>

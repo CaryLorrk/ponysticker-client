@@ -1,0 +1,20 @@
+{
+    "DOWNLOAD_TITLE_official": "官方貼圖",
+    "DOWNLOAD_TITLE_creator": "個人原創貼圖",
+    "DOWNLOAD_TITLE_custom": "客製貼圖",
+    "DOWNLOAD_PREV": "上一頁",
+    "DOWNLOAD_NEXT": "下一頁",
+    "DOWNLOAD_SEARCH": "搜尋",
+    "DOWNLOAD_PAGE_TITLE": "頁數",
+    "DOWNLOAD_PAGE_ALERT_POSITIVE_INTEGER": "請輸入正整數",
+    "DOWNLOAD_PAGE_ALERT_OUT_OF_RANGE": "此頁面超出範圍",
+    "DOWNLOAD_CANCEL": "取消",
+    "DOWNLOAD_OK": "確認",
+    "DOWNLOAD_SORT_ORDER": "排序",
+    "DOWNLOAD_ID": "序號",
+    "DOWNLOAD_DATE": "日期",
+    "DOWNLOAD_RELOAD": "重新載入",
+    "DOWNLOAD_LOADING_ERROR": "糟糕！出了些問題，請重新載入。",
+    "DOWNLOAD_SCROLL_FOR_MORE": "捲動讀取更多"
+
+}

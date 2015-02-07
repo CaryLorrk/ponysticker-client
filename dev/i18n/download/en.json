@@ -1,0 +1,19 @@
+{
+    "DOWNLOAD_TITLE_official": "Official",
+    "DOWNLOAD_TITLE_creator": "Creator",
+    "DOWNLOAD_TITLE_custom": "Custom",
+    "DOWNLOAD_PREV": "Prev",
+    "DOWNLOAD_NEXT": "Next",
+    "DOWNLOAD_SEARCH": "Search",
+    "DOWNLOAD_PAGE_TITLE": "Page",
+    "DOWNLOAD_PAGE_ALERT_POSITIVE_INTEGER": "Please enter a positive integer",
+    "DOWNLOAD_PAGE_ALERT_OUT_OF_RANGE": "This page is out of range",
+    "DOWNLOAD_CANCEL": "Cancel",
+    "DOWNLOAD_OK": "OK",
+    "DOWNLOAD_SORT_ORDER": "Sort Order",
+    "DOWNLOAD_ID": "ID",
+    "DOWNLOAD_DATE": "Date",
+    "DOWNLOAD_RELOAD": "Reload",
+    "DOWNLOAD_LOADING_ERROR": "Oooops, something is wrong. Please reload.",
+    "DOWNLOAD_SCROLL_FOR_MORE": "Scroll for more"
+}

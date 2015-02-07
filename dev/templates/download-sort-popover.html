@@ -1,0 +1,22 @@
+<ion-popover-view>
+    <ion-header-bar class="bar-positive">
+        <h1 class="title" translate>DOWNLOAD_SORT_ORDER</h1>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list">
+            <!--PackageId-->
+            <label class="item item-radio">
+                <input type="radio" ng-model="download.order" value="packageId">
+                <div class="item-content" translate>DOWNLOAD_ID</div>
+                <i class="radio-icon ion-checkmark"></i>
+            </label>
+
+            <!--Date-->
+            <label class="item item-radio">
+                <input type="radio" ng-model="download.order" value="date">
+                <div class="item-content" translate>DOWNLOAD_DATE</div>
+                <i class="radio-icon ion-checkmark"></i>
+            </label>
+        </div>
+    </ion-content>
+</ion-popover-view>

@@ -1,0 +1,2 @@
+Pony Sticker Client
+===================

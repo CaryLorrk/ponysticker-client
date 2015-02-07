@@ -1,0 +1,21 @@
+{
+  "name": "ponysticker",
+  "version": "1.0.0",
+  "description": "ponysticker: An Ionic project",
+  "dependencies": {
+    "gulp": "^3.5.6",
+    "gulp-concat": "^2.2.0",
+    "gulp-uglify": "^0.3.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-plumber": "~0.6.6",
+    "gulp-watch": "~4.1.0",
+    "gulp-minify-html": "~0.1.8",
+    "gulp-angular-htmlify": "~2.1.1",
+    "gulp-minify-css": "~0.4.5",
+    "gulp-ng-annotate": "~0.5.2",
+    "del": "~1.1.1"
+  },
+  "cordovaPlugins": [
+    "./engine/cordova-crosswalk-engine-c0.5"
+  ]
+}

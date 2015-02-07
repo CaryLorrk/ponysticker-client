@@ -1,0 +1,12 @@
+{
+    "PACKAGE_DOWNLOAD": "Download",
+    "PACKAGE_DELETE": "Delete Package",
+    "PACKAGE_SHOW_ALL": "Show All",
+    "PACKAGE_ADD_FAVORITE": "Add Favorite",
+    "PACKAGE_REMOVE_FAVORITE": "Remove Favorite",
+    "PACKAGE_SET_TAGS": "Set Tags",
+    "PACKAGE_DELETE_TITLE": "Delete",
+    "PACKAGE_DELETE_CONTENT": "Deleting will lose all your data of this package. Are you sure?",
+    "PACKAGE_DELETE_CANCEL": "Cancel",
+    "PACKAGE_DELETE_CONFRIM": "COMFIRM"
+}

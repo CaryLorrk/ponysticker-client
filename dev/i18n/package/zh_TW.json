@@ -1,0 +1,12 @@
+{
+    "PACKAGE_DOWNLOAD": "下載",
+    "PACKAGE_DELETE": "刪除貼圖包",
+    "PACKAGE_SHOW_ALL": "顯示全部",
+    "PACKAGE_ADD_FAVORITE": "加到最愛",
+    "PACKAGE_REMOVE_FAVORITE": "移除最愛",
+    "PACKAGE_SET_TAGS": "設定標籤",
+    "PACKAGE_DELETE_TITLE": "刪除",
+    "PACKAGE_DELETE_CONTENT": "刪除將會遺失所有關於此貼圖包的資料。你確定嗎？",
+    "PACKAGE_DELETE_CANCEL": "取消",
+    "PACKAGE_DELETE_CONFIRM": "確認"
+}

@@ -1,0 +1,73 @@
+<ion-view view-title={{package.packageId}}>
+    <!--Back button-->
+    <ion-nav-bar>
+        <ion-nav-back-button class="button-clear">
+        </ion-nav-back-button>
+    </ion-nav-bar>
+
+    <ion-nav-buttons side="right">
+        <!--More button-->
+        <button class="button button-icon 
+            button-clear ion-android-more-vertical"
+            ng-if="!package.remote"
+            ng-click="package.showMorePopover($event)"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <div class="list card">
+            <!--Card top-->
+            <div class="item item-avatar">
+                <img ng-src="{{package.getTabOnUrl()}}" alt="{{package.packageId}}">
+                <h2>{{package.getTitle()}}</h2>
+                <p>{{package.getAuthor()}}</p>
+            </div>
+
+            <!--Card center-->
+            <div class="item item-body">
+                <!--Download button-->
+                <button class="button button-block
+                    button-balanced"
+                    ng-click="package.download()"
+                    ng-if="package.remote"
+                    translate>
+                    PACKAGE_DOWNLOAD
+                </button>
+
+                <!--Download progress-->
+                <progress max="{{package.meta.stickers.length + 1 + 1}}"
+                    value="{{package.progress()}}"
+                    ng-show="package.isDownloading"></progress>
+                <!--Delete button-->
+                <button class="button button-block
+                    button-assertive"
+                    ng-if="!package.remote"
+                    ng-click="package.deletePackage()"
+                    translate>
+                    PACKAGE_DELETE
+                </button>
+
+
+            </div>
+
+            <!--Card bottom-->
+            <div class="item item-body">
+                <div class="thumbnails">
+                    <!--Preview-->
+                    <div class="thumbnail animation-fade" 
+                        ng-repeat="sticker in package.stickers"
+                        background-src="{{package.getStickerUrl(sticker)}}"
+                        touch-active>
+                    </div>
+                    <p class="text-info"
+                        ng-if="package.hasMore"
+                        translate>DOWNLOAD_SCROLL_FOR_MORE</p>  
+                </div>
+            </div>
+        </div>
+        <ion-infinite-scroll
+            on-infinite="package.loadMore()"
+            ng-if="package.hasMore"
+            distance="10%"
+            immediate-check="true">
+        </ion-infinite-scroll>
+    </ion-content>
+</ion-view>

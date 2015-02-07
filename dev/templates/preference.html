@@ -1,0 +1,75 @@
+<ion-view view-title="{{'PREFERENCE_TITLE' | translate}}">
+    <!--Toggle button-->
+    <ion-nav-buttons>
+        <button class="button button-icon
+            button-clear ion-navicon"
+            menu-toggle="left"
+            side="left">
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content class="has-header">
+        <ion-list>
+
+            <!--Export/Import-->
+            <ion-item>
+                <div class="button-bar">
+                    <a class="button button-positive" translate>PREFERENCE_EXPORT</a>
+                    <a class="button button-assertive" translate>PREFERENCE_IMPORT</a>
+                </div>
+            </ion-item>
+
+            <!--Language-->
+            <ion-item>
+                <label class="item-input item-select" for="">
+                    <div class="input-label" translate>
+                        PREFERENCE_LANGUAGE
+                    </div>
+                    <select ng-model="preference.language"
+                        ng-change="preference.updateLanguage()">
+                        <option value="en">English</option>
+                        <option value="zh_TW">繁體中文</option>
+                    </select>
+                </label>
+            </ion-item>
+
+            <ion-item ng-show="preference.totalMB">
+                <label class="item-input">
+                    <div class="input-label" translate>
+                        PREFERENCE_SPACE
+                    </div>
+                    {{preference.usedMB}} / {{preference.totalMB}} MB
+                </label>
+            </ion-item>
+
+
+            <!--Page size-->
+            <ion-item>
+
+                <label class="item-input item-stacked-label">
+                    <span class="input-label" translate>
+                        PREFERENCE_PAGE_SIZE
+                    </span>
+                    <div class="range">
+                        <input type="range" min="1" max="20"
+                        ng-model="preference.pageSize"
+                        ng-change="preference.updatePageSize()">
+                        {{preference.pageSize}}
+                    </div>
+                </label>
+            </ion-item>
+
+            <!--Server-->
+            <ion-item>
+                <label class="item-input item-stacked-label">
+                    <span class="input-label" translate>PREFERENCE_SERVER</span>
+                    <input type="text"
+                    ng-model="preference.server"
+                    ng-change="preference.updateServer()">
+
+                </label>
+            </ion-item>
+
+        </ion-list>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,74 @@
+.submenu {
+    display: none;
+}
+
+.submenu-button {
+    transition: background-color 0.2s linear;
+}
+
+.submenu-opened {
+    background-color: #EEE;
+}
+
+.item-submenu {
+    color: #579;
+}
+
+.item-submenu span {
+    padding-left: 10px;
+}
+
+.animation-fade.ng-enter{
+	-webkit-animation: fadeIn 1s;
+	-moz-animation: fadeIn 1s;
+	-o-animation: fadeIn 1s;
+	animation: fadeIn 1s;
+}
+
+.animation-fade.ng-leave{
+	-webkit-animation: fadeOut 1s;
+	-moz-animation: fadeOut 1s;
+	-o-animation: fadeOut 1s;
+	animation: fadeOut 1s;
+}
+
+.text-danger {
+  color: #a94442;
+}
+
+a.text-danger:hover {
+  color: #843534;
+}
+.text-info {
+  color: #31708f;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.thumbnails {
+  text-align: center;
+}
+
+.thumbnail {
+  display: inline-block;
+  padding: 2px;
+  margin: 1px 3px;
+  width: 90px;
+  height: 90px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-position: center;
+  background-size: contain;
+  border: 1px solid;
+  border-color: #DDD #000 #000 #DDD ;
+  overflow: hidden;
+}
+
+.thumbnail.touch-active {
+    border-color: #BBB #DDD #DDD #BBB;
+}
+.thumbnail:active {
+    border-color: #BBB #DDD #DDD #BBB;
+}

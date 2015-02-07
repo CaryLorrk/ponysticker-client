@@ -1,0 +1,9 @@
+{
+    "PREFERENCE_TITLE": "Preference",
+    "PREFERENCE_EXPORT": "Export",
+    "PREFERENCE_IMPORT": "Import",
+    "PREFERENCE_LANGUAGE": "Language",
+    "PREFERENCE_SERVER": "Server",
+    "PREFERENCE_PAGE_SIZE": "Page Size",
+    "PREFERENCE_SPACE": "Space"
+}
