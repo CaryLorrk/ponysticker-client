@@ -1,13 +1,34 @@
-var PonyModule = (function (m) {
+var PonyModule = (function () {
+    var m = {};
     m.isPositiveInteger = isPositiveInteger;
     m.resolveParamFactory = resolveParamFactory;
+    m.resolveIntParamFactory = resolveIntParamFactory;
     m.objSize = objSize;
+    m.objToSet = objToSet;
     
     init();
+
+    return m;
+
+    function objToSet(obj) {
+        var s = new Set();
+        s.data = obj;
+        return s;
+    }
 
     function resolveParamFactory(param) {
         var resolveFunc = function ($stateParams) {
             return $stateParams[param];
+        };
+        resolveFunc.$inject = ['$stateParams'];
+
+        return resolveFunc;
+
+    }
+
+    function resolveIntParamFactory(param) {
+        var resolveFunc = function ($stateParams) {
+            return parseInt($stateParams[param]);
         };
         resolveFunc.$inject = ['$stateParams'];
 
@@ -40,12 +61,10 @@ var PonyModule = (function (m) {
         var isChrome = !!window.chrome && !m.isOpera;              // Chrome 1+
         var isIE = /*@cc_on!@*/false || !!document.documentMode; // At least IE6
 
-        m.isOpera = function(){return isOpera;}
-        m.isFirefox = function(){return isFirefox;}
-        m.isSafari = function(){return isSafari;}
-        m.isChrome = function(){return isChrome;}
-        m.isIE = function(){return isIE;}
+        m.isOpera = function(){return isOpera;};
+        m.isFirefox = function(){return isFirefox;};
+        m.isSafari = function(){return isSafari;};
+        m.isChrome = function(){return isChrome;};
+        m.isIE = function(){return isIE;};
     }
-
-    return m;
-}({}));
+}());

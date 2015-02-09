@@ -8,5 +8,10 @@
     "PACKAGE_DELETE_TITLE": "Delete",
     "PACKAGE_DELETE_CONTENT": "Deleting will lose all your data of this package. Are you sure?",
     "PACKAGE_DELETE_CANCEL": "Cancel",
-    "PACKAGE_DELETE_CONFRIM": "COMFIRM"
+    "PACKAGE_DELETE_CONFIRM": "Confirm",
+    "PACKAGE_MORE": "More",
+    "PACKAGE_CANCEL": "Cancel",
+    "PACKAGE_ALERT_TITLE": "Alert",
+    "PACKAGE_DOWNLOAD_FIRST": "Please download package",
+    "PACKAGE_OK": "OK"
 }

@@ -16,6 +16,7 @@
     "del": "~1.1.1"
   },
   "cordovaPlugins": [
-    "./engine/cordova-crosswalk-engine-c0.5"
+    "./engine/cordova-crosswalk-engine-c0.5",
+    "https://github.com/brodysoft/Cordova-SQLitePlugin"
   ]
 }

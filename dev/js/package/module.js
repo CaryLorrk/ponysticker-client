@@ -12,7 +12,7 @@ function config($stateProvider) {
         controller: 'PackageController as package',
         resolve: {
             repo: PonyModule.resolveParamFactory('repo'),
-            packageId: PonyModule.resolveParamFactory('packageId')
+            packageId: PonyModule.resolveIntParamFactory('packageId')
             
         }
     });

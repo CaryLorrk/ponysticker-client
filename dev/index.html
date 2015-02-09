@@ -58,16 +58,17 @@
 
                         </div>
 
-                        <!--My Sticker-->
+                        <!--Local-->
                         <ion-item class="submenu-button"
-                            ng-click="menu.toggleSubmenu('mysticker')"
-                            ng-class="{'submenu-opened': menu.showSubmenu('mysticker')}"
+                            ng-click="menu.toggleSubmenu('local')"
+                            ng-class="{'submenu-opened': menu.showSubmenu('local')}"
                             translate>
                             MENU_LOCAL_STICKER
                         </ion-item>
                         <div class="submenu"
-                            slide-toggle="!menu.showSubmenu('mysticker')">
+                            slide-toggle="!menu.showSubmenu('local')">
                             <ion-item class="item-submenu"
+                                ui-sref="local({type: 'package'})"
                                 nav-clear menu-close>
                                 <span translate>
                                     MENU_PACKAGE

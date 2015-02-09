@@ -1,4 +1,6 @@
 {
   "name": "ponysticker",
-  "private": "true"
+  "private": "true",
+  "devDependencies": {
+  }
 }

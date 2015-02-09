@@ -5,18 +5,18 @@ angular
 
 function DownloadController($scope, $state,
                             $ionicScrollDelegate, $ionicPopup, $ionicPopover,
-                            $translate, preference, serverAPI, repo) {
+                            $translate, preference, serverAPI, database, repo) {
     var self = this;
     self.repo = repo;
     self.order = preference.getOrder();
     self.pkgCount = 0;
     self.page = 1;
     self.pkgList = [];
+    self.pkgTabList = [];
     self.query = '';
 
     self.getPageCount = getPageCount;
     self.search = search;
-    self.getTabOnUrl = serverAPI.getTabOnUrl;
     self.getTitle = getTitle;
     self.getAuthor = getAuthor;
     self.goPrev = goPrev;
@@ -189,6 +189,7 @@ function DownloadController($scope, $state,
 
     function refreshPkgList() {
         self.pkgList = [];
+        self.pkgTabList = [];
         self.isListLoading = true;
         serverAPI
         .getPkgList(self.repo, self.page,
@@ -199,6 +200,25 @@ function DownloadController($scope, $state,
             self.isListLoading = false;
             self.loadingListErr = false;
             self.pkgList = data;
+            
+            self.pkgList.forEach(function(pkg, idx) {
+                database
+                .getMeta('package', pkg.packageId)
+                .success(function(meta) {
+                    if (meta) {
+                        self.pkgTabList[idx] = 
+                            serverAPI.getTabOffUrl(pkg.packageId);
+                    } else {
+                        self.pkgTabList[idx] =
+                            serverAPI.getTabOnUrl(pkg.packageId);
+                    }
+                })
+                .error(function() {
+                    self.pkgTabList[idx] =
+                        serverAPI.getTabOnUrl(pkg.packageId);
+                });
+            });
+
             $ionicScrollDelegate.scrollTop();
         })
         .error(function() {

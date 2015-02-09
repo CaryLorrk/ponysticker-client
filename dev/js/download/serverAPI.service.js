@@ -8,7 +8,7 @@ function serverAPI($http, preference) {
     
     self.getMeta = getMeta;
     self.getTabOnUrl = getTabOnUrl;
-    self.getStickerKeyUrl = getStickerKeyUrl;
+    self.getTabOffUrl = getTabOffUrl;
     self.getStickerBase64 = getStickerBase64;
     self.getPkgCount = getPkgCount;
     self.getPkgList = getPkgList;
@@ -36,6 +36,12 @@ function serverAPI($http, preference) {
         return concatUrl('sticker') + '?' + $.param([
             {name: 'pkg', value: pkg},
             {name: 'sticker', value: 'tab_on'}]);
+    }
+
+    function getTabOffUrl(pkg) {
+        return concatUrl('sticker') + '?' + $.param([
+            {name: 'pkg', value: pkg},
+            {name: 'sticker', value: 'tab_off'}]);
     }
 
     function getStickerKeyUrl(pkg, sticker) {

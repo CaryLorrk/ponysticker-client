@@ -1,14 +1,14 @@
-<ion-view view-title={{package.packageId}}>
+<ion-view view-title="{{package.packageId}}">
     <!--Back button-->
     <ion-nav-bar>
-        <ion-nav-back-button class="button-clear">
+        <ion-nav-back-button>
         </ion-nav-back-button>
     </ion-nav-bar>
 
     <ion-nav-buttons side="right">
         <!--More button-->
         <button class="button button-icon 
-            button-clear ion-android-more-vertical"
+            button-clear ion-pricetags"
             ng-if="!package.remote"
             ng-click="package.showMorePopover($event)"></button>
     </ion-nav-buttons>
@@ -50,11 +50,12 @@
 
             <!--Card bottom-->
             <div class="item item-body">
+                <!--Previews-->
                 <div class="thumbnails">
-                    <!--Preview-->
                     <div class="thumbnail animation-fade" 
                         ng-repeat="sticker in package.stickers"
                         background-src="{{package.getStickerUrl(sticker)}}"
+                        ng-click="package.showActionSheet(sticker)"
                         touch-active>
                     </div>
                     <p class="text-info"

@@ -1,0 +1,15 @@
+<ion-view view-title="{{'LOCAL_TITLE_'+local.type | translate}}">
+    <ion-nav-buttons side="right">
+        <!--Tags button-->
+        <button class="button button-icon 
+            button-clear ion-pricetags"></button>
+    </ion-nav-buttons>
+    <ion-content>
+        <div class="list">
+            <div class="item"
+                ng-repeat="item in local.unselected">
+                {{item}}
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

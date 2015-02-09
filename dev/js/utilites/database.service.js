@@ -13,13 +13,104 @@ function database($q, $timeout) {
     self.init = init;
     self.addPackage = addPackage;
     self.deletePackage = deletePackage;
-    self.getPackage = getPackage;
-    self.getSticker = getSticker;
     self.updatePackage = updatePackage;
+    self.getMeta = getMeta;
+    self.addTag = addTag;
+    self.deleteTag = deleteTag;
+    self.getFilteredTags = getFilteredTags;
+
+    function getFilteredTags(type, excludes) {
+        var deferred = $q.defer();
+        checkReadyBeforeWait(function() {
+            var openCursorReq = self.db
+                    .transaction([type], 'readonly')
+                    .objectStore(type)
+                    .index('tag')
+                    .openKeyCursor();
+
+            openCursorReq.onerror = function(e) {
+
+                deferred.reject(e);
+            };
+
+            var prev = null;
+            var tags = [];
+            openCursorReq.onsuccess = function(e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    if (cursor.key !== prev &&
+                            excludes.indexOf(cursor.key) < 0) {
+                        tags.push(cursor.key);
+                        prev = cursor.key;
+                    }
+                    cursor.continue();
+                } else {
+                    deferred.resolve(tags);
+                }
+            };
+
+
+        });
+        return buildPromise(deferred.promise);
+    }
+
+    function addTag(tag, type, id) {
+        var deferred = $q.defer();
+        checkReadyBeforeWait(function() {
+            var transaction = self.db.transaction([type], 'readwrite');
+            var objStore = transaction.objectStore(type);
+            var getReq = objStore.get(id);
+            getReq.onsuccess = function(e) {
+                var meta = e.target.result;
+                meta.tags.push(tag);
+                objStore.put(meta);
+            };
+
+            transaction.oncomplete = function(e) {
+                deferred.resolve(e);
+            };
+
+            transaction.onerror = function(e) {
+                deferred.reject(e);
+            };
+        });
+        return buildPromise(deferred.promise);
+
+
+    }
+
+    function deleteTag(tag, type, id) {
+        var deferred = $q.defer();
+        checkReadyBeforeWait(function() {
+            var transaction = self.db.transaction([type], 'readwrite');
+            var objStore = transaction.objectStore(type);
+            var getReq = objStore.get(id);
+            getReq.onsuccess = function(e) {
+                var meta = e.target.result;
+                var idx = meta.tags.indexOf(tag);
+                meta.tags.splice(idx, 1);
+                objStore.put(meta);
+            };
+
+            transaction.oncomplete = function(e) {
+                deferred.resolve(e);
+            };
+
+            transaction.onerror = function(e) {
+                deferred.reject(e);
+            };
+        });
+        return buildPromise(deferred.promise);
+    }
+
+    function updateTagsWithSet(meta, s) {
+        meta.tags = s.keys();
+        meta.tagObj = s.data;
+    }
 
     function deletePackage(packageId) {
         var deferred = $q.defer();
-        checkReady(function(){
+        checkReadyBeforeWait(function(){
             var transaction =
                 self.db.transaction(['package', 'sticker'], 'readwrite');
 
@@ -50,7 +141,7 @@ function database($q, $timeout) {
 
     function updatePackage(meta) {
         var deferred = $q.defer();
-        checkReady(function() {
+        checkReadyBeforeWait(function() {
             var updateReq = self.db
             .transaction('package', 'readwrite')
             .objectStore('package')
@@ -68,36 +159,16 @@ function database($q, $timeout) {
         return buildPromise(deferred.promise);
     }
 
-    function getSticker(sticker) {
+    function getMeta(type, id) {
         var deferred = $q.defer();
-        checkReady(function() {
+        checkReadyBeforeWait(function() {
             var getReq = self.db
-            .transaction('sticker')
-            .objectStore('sticker')
-            .get(sticker);
+            .transaction(type)
+            .objectStore(type)
+            .get(id);
 
             getReq.onsuccess = function(e) {
-                deferred.resolve(e);
-            };
-            getReq.onerror = function(e) {
-                deferred.reject(e);
-            };
-        });
-
-        return buildPromise(deferred.promise);
-
-    }
-
-    function getPackage(packageId) {
-        var deferred = $q.defer();
-        checkReady(function() {
-            var getReq = self.db
-            .transaction('package')
-            .objectStore('package')
-            .get(packageId);
-
-            getReq.onsuccess = function(e) {
-                deferred.resolve(e);
+                deferred.resolve(e.target.result);
             };
             getReq.onerror = function(e) {
                 deferred.reject(e);
@@ -125,8 +196,8 @@ function database($q, $timeout) {
                         id: parseInt(key),
                         packageId: meta.packageId,
                         recent: 0,
-                        tags: [],
                         star: 0,
+                        tags: [],
                         base64: stickersBase64[key]
                     };
                     stickerObjStore.add(sticker);
@@ -155,6 +226,14 @@ function database($q, $timeout) {
         }, 200);
     }
 
+    function checkReadyBeforeWait(fn) {
+        if (isAllReady()) {
+            fn();
+        } else {
+            checkReady(fn);
+        }
+    }
+
     function isAllReady() {
         return pkgObjStoreReady &&
             stickerObjStoreReady;
@@ -181,10 +260,14 @@ function database($q, $timeout) {
 
     function init() {
         if (ionic.Platform.isWebView() || ionic.Platform.isIOS() || PonyModule.isSafari()) {
-            window.shimIndexedDB.__useShim();
+            indexedDB = window._indexedDB || window.indexedDB;
+        } else {
+            indexedDB = window.indexedDB || window._indexedDB;
         }
 
-        indexedDB = window._indexedDB || window.indexedDB;
+        if (!indexedDB) {
+            //TODO
+        }
         var openReq = indexedDB.open('ponyDB', self.dbVersion);
         openReq.onupgradeneeded = function(e) {
             self.db = e.target.result;
@@ -192,30 +275,28 @@ function database($q, $timeout) {
                 var pkgObjStore = self.db.createObjectStore('package', {keyPath: 'packageId'});
                 pkgObjStore.createIndex('date', 'date', {unique:false});
                 pkgObjStore.createIndex('star', 'star', { unique: false });
-                pkgObjStore.createIndex('tag', 'tags', { unique: false });
-
+                pkgObjStore.createIndex('tag', 'tags', { unique: false, multiEntry:true });
                 pkgObjStore.transaction.oncomplete = function(e) {
                     pkgObjStoreReady = true;
                 };
-
                 pkgObjStore.transaction.onerror = function(e) {
                     //TODO
                 };
 
+
                 var stickerObjStore = self.db.createObjectStore('sticker', {keyPath: 'id'});
                 stickerObjStore.createIndex('packageId', 'packageId', {unique: false});
                 stickerObjStore.createIndex('recent', 'recent', {unique:false});
-                stickerObjStore.createIndex('tag', 'tags', {unique:false, multiEntry: true});
                 stickerObjStore.createIndex('star', 'star', {unique:false});
-
+                stickerObjStore.createIndex('tag', 'tags', { unique: false, multiEntry:true });
                 stickerObjStore.transaction.oncomplete = function(e) {
                     stickerObjStoreReady = true;
                 };
-
                 stickerObjStore.transaction.onerror = function(e) {
                     //TODO
                 };
 
+                
 
             }
         }; 

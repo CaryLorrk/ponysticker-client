@@ -4,15 +4,18 @@ angular
     'ionic',
     'pascalprecht.translate',
     'ponysticker.utilites',
+    'ponysticker.menu',
+    'ponysticker.local',
     'ponysticker.package',
     'ponysticker.download',
+    'ponysticker.tags',
     'ponysticker.preference'
 ])
 .config(config)
 .run(run);
 
-function config($translateProvider, $translatePartialLoaderProvider) {
-    $translatePartialLoaderProvider.addPart('menu');
+function config($ionicConfigProvider, $translateProvider) {
+    $ionicConfigProvider.views.transition('none');
     $translateProvider.useLoader('$translatePartialLoader', {
         urlTemplate: 'i18n/{part}/{lang}.json'
     });

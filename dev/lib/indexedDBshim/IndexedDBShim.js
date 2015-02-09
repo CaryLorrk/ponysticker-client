@@ -1567,11 +1567,12 @@ var cleanInterface = false;
 'use strict';
 (function(idbModules){
     var DEFAULT_DB_SIZE = 4 * 1024 * 1024;
-    if (!window.openDatabase) {
+    var sqliteDB = window.sqlitePlugin || window;
+    if (!sqliteDB.openDatabase) {
         return;
     }
     // The sysDB to keep track of version numbers for databases
-    var sysdb = window.openDatabase("__sysdb__", 1, "System Database", DEFAULT_DB_SIZE);
+    var sysdb = sqliteDB.openDatabase("__sysdb__", 1, "System Database", DEFAULT_DB_SIZE);
     sysdb.transaction(function(tx){
         tx.executeSql("CREATE TABLE IF NOT EXISTS dbVersions (name VARCHAR(255), version INT);", []);
     }, function() {
@@ -1600,7 +1601,7 @@ var cleanInterface = false;
             }
             
             function openDB(oldVersion){
-                var db = window.openDatabase(name, 1, name, DEFAULT_DB_SIZE);
+                var db = sqliteDB.openDatabase(name, 1, name, DEFAULT_DB_SIZE);
                 req.readyState = "done";
                 if (typeof version === "undefined") {
                     version = oldVersion || 1;
@@ -1690,7 +1691,7 @@ var cleanInterface = false;
                         return;
                     }
                     version = data.rows.item(0).version;
-                    var db = window.openDatabase(name, 1, name, DEFAULT_DB_SIZE);
+                    var db = sqliteDB.openDatabase(name, 1, name, DEFAULT_DB_SIZE);
                     db.transaction(function(tx){
                         tx.executeSql("SELECT * FROM __sys__", [], function(tx, data){
                             var tables = data.rows;
@@ -1730,7 +1731,8 @@ var cleanInterface = false;
 /*jshint globalstrict: true*/
 'use strict';
 (function(window, idbModules){
-    if (typeof window.openDatabase !== "undefined") {
+    if ((typeof window.sqlitePlugin !== "undefined") ||
+        (typeof window.openDatabase !== "undefined")) {
         window.shimIndexedDB = idbModules.shimIndexedDB;
         if (window.shimIndexedDB) {
             window.shimIndexedDB.__useShim = function(){
@@ -1789,4 +1791,4 @@ var cleanInterface = false;
     }
     
 }(window, idbModules));
-
+window.shimIndexedDB.__useShim();

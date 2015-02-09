@@ -17,7 +17,9 @@ gulp.task('js', function() {
     return gulp.src([
         'dev/lib/jquery/jquery-1.11.2.js',
         'dev/lib/ionic/js/ionic.bundle.js',
-        'dev/lib/angular-translate/**/*.js',
+        'dev/lib/angular-translate/*.js',
+        'dev/lib/angular-translate-loader-partial/*.js',
+        'dev/lib/indexedDBshim/IndexedDBShim.js',
         'dev/lib/**/*.js',
         'dev/js/utilites.js',
         'dev/js/ponysticker.js',
@@ -25,8 +27,8 @@ gulp.task('js', function() {
         'dev/js/**/*.js'])
             .pipe(plumber())
             .pipe(concat('ponysticker.concat.js'))
-            .pipe(ngAnnotate())
-            .pipe(uglify())
+            //.pipe(ngAnnotate())
+            //.pipe(uglify())
             .pipe(rename('ponysticker.min.js'))
             .pipe(gulp.dest('www/js'));
 });
@@ -44,7 +46,7 @@ gulp.task('res', function() {
 gulp.task('html', function() {
     gulp.src(['dev/**/*.html'])
     //.pipe(ngHtmlify())
-    .pipe(minifyHtml({empty: true}))
+    //.pipe(minifyHtml({empty: true}))
     .pipe(gulp.dest('www'));
 });
 
@@ -52,7 +54,7 @@ gulp.task('css', function() {
     gulp.src(['dev/lib/**/*.css',
         'dev/css/*.css'])
     .pipe(concat('ponysticker.concat.css'))
-    .pipe(minifyCss())
+    //.pipe(minifyCss())
     .pipe(rename('ponysticker.min.css'))
     .pipe(gulp.dest('www/css'));
 });

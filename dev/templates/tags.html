@@ -1,0 +1,44 @@
+<ion-view view-title="{{'TAGS_TITLE' | translate}}">
+    <!--Back button-->
+    <ion-nav-bar>
+        <ion-nav-back-button>
+        </ion-nav-back-button>
+    </ion-nav-bar>
+
+    <!--Search bar-->
+    <div class="bar bar-subheader item-input-inset">
+        <label class="item-input-wrapper">
+            <i class="icon ion-search placeholder-icon"></i>
+            <input type="search"
+            placeholder="{{'TAGS_SEARCH_OR_ADD' | translate}}"
+            ng-model="tags.query"
+            ng-keyup="tags.addTagInField($event)">
+
+        </label>
+        <button class="button button-clear button-icon ion-plus"
+            ng-click="tags.addTagDirectly()">
+        </button>
+    </div>
+    <ion-content class="has-header has-subheader">
+        <div class="list">
+            <div class="item item-divider" translate>
+                TAGS_SELECTED
+            </div>
+            <a class="item item-icon-right animation-flip"
+                ng-repeat="tag in tags.selected | filter:tags.query"
+                ng-click="tags.deleteTag(tag)">
+                {{tag}}
+                <i class="icon ion-minus-circled text-danger"></i>
+            </a>
+            <div class="item item-divider" translate>
+                TAGS_UNSELECTED
+            </div>
+            <a class="item item-icon-right animation-flip"
+                ng-repeat="tag in tags.unselected | filter:tags.query"
+                ng-click="tags.addTag(tag)">
+                {{tag}}
+                <i class="icon ion-plus-circled text-info"></i>
+            </a>
+        </div>
+    </ion-content>
+</ion-view>

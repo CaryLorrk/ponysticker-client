@@ -45,7 +45,7 @@
             <a class="item item-thumbnail-left animation-fade"
                 ng-repeat="pkg in download.pkgList"
                 ui-sref="package({repo:download.repo, packageId: pkg.packageId})">
-                <img ng-src="{{download.getTabOnUrl(pkg.packageId)}}" alt="{{pkg.packageId}}">
+                <img ng-src="{{download.pkgTabList[$index]}}" alt="{{pkg.packageId}}">
                 <p>{{pkg.packageId}}</p>
                 <h2>{{download.getTitle(pkg)}}</h2>
                 <p>{{download.getAuthor(pkg)}}</p>

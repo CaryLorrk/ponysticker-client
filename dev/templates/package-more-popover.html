@@ -1,21 +1,27 @@
 <ion-popover-view>
+    <ion-header-bar class="bar-positive">
+        <h1 class="title" translate>PACKAGE_MORE</h1>
+    </ion-header-bar>
     <ion-content>
         <div class="list">
-            <div class="item" 
+            <a class="item" 
                 ng-if="!package.favorite"
                 ng-click="package.addFavorite()"
                 translate>
                 PACKAGE_ADD_FAVORITE
-            </div>
-            <div class="item"
+            </a>
+            <a class="item"
                 ng-if="package.favorite"
                 ng-click="package.removeFavorite()"
                 translate>
                 PACKAGE_REMOVE_FAVORITE
-            </div>
-            <div class="item" translate>
+            </a>
+            <a class="item"
+                ui-sref="tags({type:'package', id: package.packageId})"
+                ng-click="package.morePopover.hide()"
+                translate>
                 PACKAGE_SET_TAGS
-            </div>
+            </a>
         </div>
     </ion-content>
 </ion-popover-view>

@@ -1,6 +1,6 @@
 (function () {
 angular
-.module('ponysticker')
+.module('ponysticker.menu')
 .controller('MenuController', MenuController);
 
 function MenuController() {

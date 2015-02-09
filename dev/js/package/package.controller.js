@@ -3,12 +3,12 @@ angular
 .module('ponysticker.package')
 .controller('PackageController', PackageController);
 
-function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $translate,
-                           preference, serverAPI, database, repo, packageId) {
+function PackageController($scope, $timeout, $ionicActionSheet, $ionicPopup, $ionicPopover, $state, 
+                           $translate, preference, serverAPI, database, repo, packageId) {
     var self = this;
     var prefixDataURI = 'data:image/jpg;base64,';
     self.repo = repo;
-    self.packageId = parseInt(packageId);
+    self.packageId = packageId;
     self.remote = false;
     self.favorite = false;
     self.stickersBase64 = {};
@@ -30,8 +30,53 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $transl
     self.deletePackage = deletePackage;
     self.loadMore = loadMore;
     self.showMorePopover = showMorePopover;
+    self.showActionSheet = showActionSheet;
 
     init();
+
+    function showActionSheet(sticker) {
+        $translate([
+            'PACKAGE_SET_TAGS',
+            'PACKAGE_CANCEL'
+        ])
+        .then(function(trans) {
+            $ionicActionSheet.show({
+                buttons: [
+                    { text: trans.PACKAGE_SET_TAGS },
+                ],
+                cancelText: trans.PACKAGE_CANCEL,
+                buttonClicked: function(index) {
+                    switch(index) {
+                    case 0:
+                        actionSheetSetTags(sticker);
+                        break;
+                    }
+                    return true;
+                },
+            });
+        });
+    }
+
+    function actionSheetSetTags(sticker) {
+        if (!self.remote) {
+            $state.go('tags', {
+                type:'sticker',
+                id: sticker});
+        } else {
+            $translate([
+                'PACKAGE_ALERT_TITLE',
+                'PACKAGE_DOWNLOAD_FIRST',
+                'PACKAGE_OK'])
+            .then(function(trans) {
+                $ionicPopup.alert({
+                    title: trans.PACKAGE_ALERT_TITLE,
+                    template: '<p class="text-center">'+trans.PACKAGE_DOWNLOAD_FIRST+'</p>',
+                    okText: trans.PACKAGE_OK
+                });
+            });
+        }
+        
+    }
 
     function showMorePopover($event) {
         self.morePopover.show($event);
@@ -82,7 +127,8 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $transl
                 title: trans.PACKAGE_DELETE_TITLE,
                 template: trans.PACKAGE_DELETE_CONTENT,
                 cancelText: trans.PACKAGE_DELETE_CANCEL,
-                okText: trans.PACKAGE_DELETE_CONFIRM
+                okText: trans.PACKAGE_DELETE_CONFIRM,
+                okType: 'button-assertive'
             })
             .then(function(res) {
                 if (res) {
@@ -204,9 +250,9 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $transl
         buildMorePopover();
 
         database
-        .getPackage(self.packageId)
-        .success(function(e) {
-            self.meta = e.target.result;
+        .getMeta('package', self.packageId)
+        .success(function(meta) {
+            self.meta = meta;
             if (!self.meta) {
                 self.remote = true;
                 initFromRemote();
@@ -223,7 +269,7 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $transl
     }
 
     function buildMorePopover() {
-        $ionicPopover.fromTemplateUrl(
+        self.morePopover = $ionicPopover.fromTemplateUrl(
             'templates/package-more-popover.html', {
             scope: $scope,
         }).then(function(popover) {
@@ -234,9 +280,9 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $transl
     function getStickersBase64() {
         self.meta.stickers.forEach(function(sticker) {
             database
-            .getSticker(sticker)
-            .success(function(e) {
-                self.stickersBase64[sticker] = e.target.result.base64;
+            .getMeta('sticker', sticker)
+            .success(function(meta) {
+                self.stickersBase64[sticker] = meta.base64;
             })
             .error(function() {
                 //TODO
