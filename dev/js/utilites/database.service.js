@@ -7,8 +7,10 @@ function database($q, $timeout) {
     var self = this;
     var pkgObjStoreReady = false;
     var stickerObjStoreReady = false;
-    self.dbVersion = 1;
+    var pkgTagObjStoreReady = false;
+    var stickerTagObjStoreReady = false;
     var indexedDB = null;
+    self.dbVersion = 1;
 
     self.init = init;
     self.addPackage = addPackage;
@@ -17,53 +19,92 @@ function database($q, $timeout) {
     self.getMeta = getMeta;
     self.addTag = addTag;
     self.deleteTag = deleteTag;
-    self.getFilteredTags = getFilteredTags;
+    self.getClassifiedTags = getClassifiedTags;
+    self.getAllTags = getAllTags;
 
-    function getFilteredTags(type, excludes) {
+    function getAllTags(type) {
+        var objStoreName = type+'Tag';
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
-            var openCursorReq = self.db
-                    .transaction([type], 'readonly')
-                    .objectStore(type)
-                    .index('tag')
-                    .openKeyCursor();
+            var cursorReq = self.db
+            .transaction([objStoreName], 'readonly')
+            .objectStore(objStoreName)
+            .openCursor();
 
-            openCursorReq.onerror = function(e) {
-
+            cursorReq.onerror = function(e) {
                 deferred.reject(e);
             };
 
-            var prev = null;
-            var tags = [];
-            openCursorReq.onsuccess = function(e) {
+            var tags = {};
+            cursorReq.onsuccess = function(e) {
                 var cursor = e.target.result;
                 if (cursor) {
-                    if (cursor.key !== prev &&
-                            excludes.indexOf(cursor.key) < 0) {
-                        tags.push(cursor.key);
-                        prev = cursor.key;
-                    }
+                    tags[cursor.value.tag] = true;
                     cursor.continue();
                 } else {
                     deferred.resolve(tags);
                 }
             };
+        });
+        return buildPromise(deferred.promise);
 
+    }
 
+    function getClassifiedTags(type, id) {
+        var objStoreName = type+'Tag';
+        var deferred = $q.defer();
+        checkReadyBeforeWait(function() {
+            var cursorReq = self.db
+            .transaction([objStoreName], 'readonly')
+            .objectStore(objStoreName)
+            .openCursor();
+
+            cursorReq.onerror = function(e) {
+                deferred.reject(e);
+            };
+
+            var selected = {};
+            var unselected = {};
+            cursorReq.onsuccess = function(e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    if (cursor.value.id === id) {
+                        selected[cursor.value.tag] = true;
+                    } else {
+                        unselected[cursor.value.tag] = true;
+                    }
+                    cursor.continue();
+                } else {
+                    for (var key in selected) {
+                        if (selected.hasOwnProperty(key)) {
+                            delete unselected[key];
+                        }
+                    }
+                    deferred.resolve([selected, unselected]);
+                }
+            };
         });
         return buildPromise(deferred.promise);
     }
 
     function addTag(tag, type, id) {
+        var objStoreName = type+'Tag';
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
-            var transaction = self.db.transaction([type], 'readwrite');
-            var objStore = transaction.objectStore(type);
-            var getReq = objStore.get(id);
-            getReq.onsuccess = function(e) {
-                var meta = e.target.result;
-                meta.tags.push(tag);
-                objStore.put(meta);
+            var idKeyRange = window.IDBKeyRange.only(id);
+            var transaction = self.db.transaction([objStoreName], 'readwrite');
+            var objStore = transaction.objectStore(objStoreName);
+            var cursorReq = objStore.index('id').openCursor(idKeyRange);
+
+            cursorReq.onsuccess = function(e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    if (cursor.value.tag !== tag) {
+                        cursor.continue();
+                    }
+                } else {
+                    var putReq = objStore.put({tag: tag, id: id});
+                }
             };
 
             transaction.oncomplete = function(e) {
@@ -73,23 +114,29 @@ function database($q, $timeout) {
             transaction.onerror = function(e) {
                 deferred.reject(e);
             };
+
         });
         return buildPromise(deferred.promise);
-
-
     }
 
     function deleteTag(tag, type, id) {
+        var objStoreName = type+'Tag';
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
-            var transaction = self.db.transaction([type], 'readwrite');
-            var objStore = transaction.objectStore(type);
-            var getReq = objStore.get(id);
-            getReq.onsuccess = function(e) {
-                var meta = e.target.result;
-                var idx = meta.tags.indexOf(tag);
-                meta.tags.splice(idx, 1);
-                objStore.put(meta);
+            var idKeyRange = window.IDBKeyRange.only(id);
+            var transaction = self.db.transaction([objStoreName], 'readwrite');
+            var objStore = transaction.objectStore(objStoreName);
+            var cursorReq = objStore.index('id').openCursor(idKeyRange);
+
+            cursorReq.onsuccess = function(e) {
+                var cursor = e.target.result;
+                if (cursor) {
+                    if (cursor.value.tag === tag) {
+                        var deleteReq = objStore.delete(cursor.primaryKey);
+                    } else {
+                        cursor.continue();
+                    }
+                }
             };
 
             transaction.oncomplete = function(e) {
@@ -101,11 +148,6 @@ function database($q, $timeout) {
             };
         });
         return buildPromise(deferred.promise);
-    }
-
-    function updateTagsWithSet(meta, s) {
-        meta.tags = s.keys();
-        meta.tagObj = s.data;
     }
 
     function deletePackage(packageId) {
@@ -185,7 +227,7 @@ function database($q, $timeout) {
             var pkgObjStore = transaction.objectStore('package');
             meta.date = (new Date()).getTime();
             meta.star = 0;
-            meta.tags = [];
+            meta.tags = {};
             meta.tabOnBase64 = tabOnBase64;
             pkgObjStore.add(meta);
 
@@ -197,7 +239,7 @@ function database($q, $timeout) {
                         packageId: meta.packageId,
                         recent: 0,
                         star: 0,
-                        tags: [],
+                        tags: {},
                         base64: stickersBase64[key]
                     };
                     stickerObjStore.add(sticker);
@@ -236,8 +278,9 @@ function database($q, $timeout) {
 
     function isAllReady() {
         return pkgObjStoreReady &&
-            stickerObjStoreReady;
-
+            stickerObjStoreReady &&
+            pkgTagObjStoreReady &&
+            stickerTagObjStoreReady;
     }
 
     function buildPromise(promise) {
@@ -275,11 +318,20 @@ function database($q, $timeout) {
                 var pkgObjStore = self.db.createObjectStore('package', {keyPath: 'packageId'});
                 pkgObjStore.createIndex('date', 'date', {unique:false});
                 pkgObjStore.createIndex('star', 'star', { unique: false });
-                pkgObjStore.createIndex('tag', 'tags', { unique: false, multiEntry:true });
                 pkgObjStore.transaction.oncomplete = function(e) {
                     pkgObjStoreReady = true;
                 };
                 pkgObjStore.transaction.onerror = function(e) {
+                    //TODO
+                };
+
+                var pkgTagObjStore = self.db.createObjectStore('packageTag', {autoIncrement: true});
+                pkgTagObjStore.createIndex('tag', 'tag', {unique: false});
+                pkgTagObjStore.createIndex('id', 'id', {unique: false});
+                pkgTagObjStore.transaction.oncomplete = function(e) {
+                    pkgTagObjStoreReady = true;
+                };
+                pkgTagObjStore.transaction.onerror = function(e) {
                     //TODO
                 };
 
@@ -288,7 +340,6 @@ function database($q, $timeout) {
                 stickerObjStore.createIndex('packageId', 'packageId', {unique: false});
                 stickerObjStore.createIndex('recent', 'recent', {unique:false});
                 stickerObjStore.createIndex('star', 'star', {unique:false});
-                stickerObjStore.createIndex('tag', 'tags', { unique: false, multiEntry:true });
                 stickerObjStore.transaction.oncomplete = function(e) {
                     stickerObjStoreReady = true;
                 };
@@ -296,13 +347,22 @@ function database($q, $timeout) {
                     //TODO
                 };
 
-                
-
+                var stickerTagObjStore = self.db.createObjectStore('stickerTag', {autoIncrement: true});
+                stickerTagObjStore.createIndex('tag', 'tag', {unique: false});
+                stickerTagObjStore.createIndex('id', 'id', {unique: false});
+                stickerTagObjStore.transaction.oncomplete = function(e) {
+                    stickerTagObjStoreReady = true;
+                };
+                stickerTagObjStore.transaction.onerror = function(e) {
+                    //TODO
+                };
             }
         }; 
         openReq.onsuccess = function(e) {
             pkgObjStoreReady = true;
             stickerObjStoreReady = true;
+            pkgTagObjStoreReady = true;
+            stickerTagObjStoreReady = true;
             self.db = e.target.result;
         };
 

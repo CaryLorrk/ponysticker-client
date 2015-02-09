@@ -6,12 +6,20 @@ angular
 function LocalController(database, type) {
     var self = this;
     self.type = type;
-    self.selected = [];
-    self.unselected = [];
+    self.selected = {};
+    self.unselected = {};
+    self.getKeys = getKeys;
+    self.showTagModal = showTagModal;
     
-    self.items = [1,2,3,4];
-
     init();
+
+    function showTagModal() {
+
+    }
+
+    function getKeys(obj) {
+        return Object.keys(obj);
+    }
 
     function init() {
         getUnselected();
@@ -19,7 +27,7 @@ function LocalController(database, type) {
 
     function getUnselected() {
         database
-        .getFilteredTags(self.type, [])
+        .getAllTags(self.type, [])
         .success(function(tags) {
             self.unselected = tags;
         })

@@ -8,24 +8,28 @@ function TagsController($ionicPopup, $translate, database, type, id) {
 
     self.type = type;
     self.id = id;
-    self.unselected = [];
-    self.selected = [];
+    self.unselected = {};
+    self.selected = {};
     self.query = '';
 
     self.addTag = addTag;
     self.deleteTag = deleteTag;
     self.addTagDirectly = addTagDirectly;
     self.addTagInField= addTagInField;
+    self.getKeys = getKeys;
 
     init();
+
+    function getKeys(obj) {
+        return Object.keys(obj);
+    }
 
     function addTag(tag) {
         database
         .addTag(tag, self.type, self.id)
         .success(function() {
-            var idx = self.unselected.indexOf(tag);
-            self.selected.push(tag);
-            self.unselected.splice(idx, 1);
+            delete self.unselected[tag];
+            self.selected[tag] = true;
         })
         .error(function() {
             //TODO
@@ -36,9 +40,8 @@ function TagsController($ionicPopup, $translate, database, type, id) {
         database
         .deleteTag(tag, self.type, self.id) 
         .success(function() {
-            var idx = self.selected.indexOf(tag);
-            self.unselected.push(tag);
-            self.selected.splice(idx, 1);
+            delete self.selected[tag];
+            self.unselected[tag] = true;
         })
         .error(function() {
             //TODO
@@ -47,18 +50,16 @@ function TagsController($ionicPopup, $translate, database, type, id) {
 
     function addTagDirectly() {
         if (!self.query ||
-            self.selected.indexOf(self.query) >= 0) {
+            self.selected[self.query]) {
             return;
         }
 
         database
         .addTag(self.query, self.type, self.id)
         .success(function() {
-            self.selected.push(self.query);
-            var idx = self.unselected.indexOf(self.query);
-            if (idx >= 0) {
-                self.unselected.splice(idx, 1);
-            }
+            self.selected[self.query] = true;
+            delete self.unselected[self.query];
+            self.query = '';
         })
         .error(function() {
             //TODO
@@ -72,7 +73,15 @@ function TagsController($ionicPopup, $translate, database, type, id) {
     }
 
     function init() {
-        getSelected();
+        database
+        .getClassifiedTags(self.type, self.id)
+        .success(function(res) {
+            self.selected = res[0];
+            self.unselected = res[1];
+        })
+        .error(function() {
+            //TODO
+        });
     }
 
     function getSelected() {

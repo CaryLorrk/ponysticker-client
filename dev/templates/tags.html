@@ -25,7 +25,7 @@
                 TAGS_SELECTED
             </div>
             <a class="item item-icon-right animation-flip"
-                ng-repeat="tag in tags.selected | filter:tags.query"
+                ng-repeat="tag in tags.getKeys(tags.selected) | filter:tags.query"
                 ng-click="tags.deleteTag(tag)">
                 {{tag}}
                 <i class="icon ion-minus-circled text-danger"></i>
@@ -34,7 +34,7 @@
                 TAGS_UNSELECTED
             </div>
             <a class="item item-icon-right animation-flip"
-                ng-repeat="tag in tags.unselected | filter:tags.query"
+                ng-repeat="tag in tags.getKeys(tags.unselected) | filter:tags.query"
                 ng-click="tags.addTag(tag)">
                 {{tag}}
                 <i class="icon ion-plus-circled text-info"></i>
