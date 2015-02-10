@@ -563,6 +563,7 @@ function database($q, $timeout) {
 
     function init() {
         if (ionic.Platform.isWebView() || ionic.Platform.isIOS() || PonyModule.isSafari()) {
+            window.shimIndexedDB.__useShim();
             indexedDB = window._indexedDB || window.indexedDB;
             IDBKeyRange = window._IDBKeyRange || window.IDBKeyRange;
         } else {

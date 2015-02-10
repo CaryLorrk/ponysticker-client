@@ -1791,4 +1791,3 @@ var cleanInterface = false;
     }
     
 }(window, idbModules));
-window.shimIndexedDB.__useShim();
