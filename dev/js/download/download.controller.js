@@ -4,8 +4,8 @@ angular
 .controller('DownloadController', DownloadController);
 
 function DownloadController($scope, $state,
-                            $ionicScrollDelegate, $ionicPopup, $ionicPopover,
-                            $translate, preference, serverAPI, database, repo) {
+        $ionicScrollDelegate, $ionicPopup, $ionicPopover,
+        $translate, preference, serverAPI, database, repo) {
     var self = this;
     self.repo = repo;
     self.order = preference.getOrder();
@@ -166,6 +166,11 @@ function DownloadController($scope, $state,
         refreshAll();
         buildSortPopover();
         watchOrder();
+        $scope.$on('$ionicView.enter', enterCheck);
+    }
+
+    function enterCheck() {
+        checkPkgDownloaded();
     }
 
     function buildSortPopover() {
@@ -200,30 +205,32 @@ function DownloadController($scope, $state,
             self.isListLoading = false;
             self.loadingListErr = false;
             self.pkgList = data;
-            
-            self.pkgList.forEach(function(pkg, idx) {
-                database
-                .getMeta('package', pkg.packageId)
-                .success(function(meta) {
-                    if (meta) {
-                        self.pkgTabList[idx] = 
-                            serverAPI.getTabOffUrl(pkg.packageId);
-                    } else {
-                        self.pkgTabList[idx] =
-                            serverAPI.getTabOnUrl(pkg.packageId);
-                    }
-                })
-                .error(function() {
-                    self.pkgTabList[idx] =
-                        serverAPI.getTabOnUrl(pkg.packageId);
-                });
-            });
-
+            checkPkgDownloaded();
             $ionicScrollDelegate.scrollTop();
         })
         .error(function() {
             self.isListLoading = false;
             self.loadingListErr = true;
+        });
+    }
+
+    function checkPkgDownloaded() {
+        self.pkgList.forEach(function(pkg, idx) {
+            database
+            .getMeta('package', pkg.packageId)
+            .success(function(meta) {
+                if (meta) {
+                    self.pkgTabList[idx] = 
+                        serverAPI.getTabOffUrl(pkg.packageId);
+                } else {
+                    self.pkgTabList[idx] =
+                        serverAPI.getTabOnUrl(pkg.packageId);
+                }
+            })
+            .error(function() {
+                self.pkgTabList[idx] =
+                    serverAPI.getTabOnUrl(pkg.packageId);
+            });
         });
     }
 

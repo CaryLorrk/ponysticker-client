@@ -4,17 +4,35 @@ var PonyModule = (function () {
     m.resolveParamFactory = resolveParamFactory;
     m.resolveIntParamFactory = resolveIntParamFactory;
     m.objSize = objSize;
-    m.objToSet = objToSet;
+    m.objIntersection = objIntersection;
+    m.objUnionInPlace = objUnionInPlace;
     
     init();
 
     return m;
 
-    function objToSet(obj) {
-        var s = new Set();
-        s.data = obj;
-        return s;
+    function objIntersection(obj1, obj2) {
+        var obj = {};
+        for(var key in obj1) {
+            if (obj1.hasOwnProperty(key)) {
+                if (obj2.hasOwnProperty(key)) {
+                    obj[key] = true;
+                }
+            }
+        }
+        return obj;
     }
+
+    function objUnionInPlace(obj1, obj2) {
+        for (var key in obj2) {
+            if (obj2.hasOwnProperty(key)) {
+                obj1[key] = true;
+            }
+        }
+        return obj1;
+    }
+
+
 
     function resolveParamFactory(param) {
         var resolveFunc = function ($stateParams) {

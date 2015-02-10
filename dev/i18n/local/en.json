@@ -1,4 +1,12 @@
 {
     "LOCAL_TITLE_package": "Local Package",
-    "LOCAL_TITLE_sticker": "Local Sticker"
+    "LOCAL_TITLE_sticker": "Local Sticker",
+    "LOCAL_TAGS_COMPLETE": "Complete",
+    "LOCAL_TAGS_CLEAR": "Clear",
+    "LOCAL_CHOOSE_TAGS": "Choose Tags",
+    "LOCAL_SEARCH": "Search",
+    "LOCAL_SELECTED": "Selected tags",
+    "LOCAL_UNSELECTED": "Unselected tags",
+    "LOCAL_PREV": "Prev",
+    "LOCAL_NEXT": "Next"
 }

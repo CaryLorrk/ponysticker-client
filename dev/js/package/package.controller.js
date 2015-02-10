@@ -3,8 +3,8 @@ angular
 .module('ponysticker.package')
 .controller('PackageController', PackageController);
 
-function PackageController($scope, $timeout, $ionicActionSheet, $ionicPopup, $ionicPopover, $state, 
-                           $translate, preference, serverAPI, database, repo, packageId) {
+function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state, 
+                           $translate, stickerActionSheet, preference, serverAPI, database, repo, packageId) {
     var self = this;
     var prefixDataURI = 'data:image/jpg;base64,';
     self.repo = repo;
@@ -35,48 +35,9 @@ function PackageController($scope, $timeout, $ionicActionSheet, $ionicPopup, $io
     init();
 
     function showActionSheet(sticker) {
-        $translate([
-            'PACKAGE_SET_TAGS',
-            'PACKAGE_CANCEL'
-        ])
-        .then(function(trans) {
-            $ionicActionSheet.show({
-                buttons: [
-                    { text: trans.PACKAGE_SET_TAGS },
-                ],
-                cancelText: trans.PACKAGE_CANCEL,
-                buttonClicked: function(index) {
-                    switch(index) {
-                    case 0:
-                        actionSheetSetTags(sticker);
-                        break;
-                    }
-                    return true;
-                },
-            });
-        });
+        stickerActionSheet(sticker);
     }
 
-    function actionSheetSetTags(sticker) {
-        if (!self.remote) {
-            $state.go('tags', {
-                type:'sticker',
-                id: sticker});
-        } else {
-            $translate([
-                'PACKAGE_ALERT_TITLE',
-                'PACKAGE_DOWNLOAD_FIRST',
-                'PACKAGE_OK'])
-            .then(function(trans) {
-                $ionicPopup.alert({
-                    title: trans.PACKAGE_ALERT_TITLE,
-                    template: '<p class="text-center">'+trans.PACKAGE_DOWNLOAD_FIRST+'</p>',
-                    okText: trans.PACKAGE_OK
-                });
-            });
-        }
-        
-    }
 
     function showMorePopover($event) {
         self.morePopover.show($event);
@@ -149,7 +110,7 @@ function PackageController($scope, $timeout, $ionicActionSheet, $ionicPopup, $io
     function addFavorite() {
         self.meta.star = 1;
         database
-        .updatePackage(self.meta)
+        .updateMeta('package', self.meta)
         .success(function() {
             self.favorite = true;
         })
@@ -159,9 +120,9 @@ function PackageController($scope, $timeout, $ionicActionSheet, $ionicPopup, $io
     }
 
     function removeFavorite() {
-        self.meta.star = 1;
+        self.meta.star = 0;
         database
-        .updatePackage(self.meta)
+        .updateMeta('package', self.meta)
         .success(function() {
             self.favorite = false;
         })

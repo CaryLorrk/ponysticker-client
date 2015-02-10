@@ -1,34 +1,33 @@
 (function () {
 angular
-.module('ponysticker.local', [])
+.module('ponysticker.favorite', [])
 .config(config)
 .run(run);
 
 function config($stateProvider) {
     $stateProvider
-    .state('local', {
-        url: '/local/:type',
-        templateUrl: 'templates/local.html',
-        controller: 'LocalController as local',
+    .state('favorite', {
+        url: '/favorite/:type',
+        templateUrl: 'templates/favorite.html',
+        controller: 'FavoriteController as favorite',
         resolve: {
             type: PonyModule.resolveParamFactory('type')
         }
     })
-    .state('local.package', {
+    .state('favorite.package', {
         url: '/package',
-        templateUrl: 'templates/local-package.html',
+        templateUrl: 'templates/favorite-package.html',
         controller: 'LocalPackageController as package'
     })
-    .state('local.sticker', {
+    .state('favorite.sticker', {
         url: '/sticker',
-        templateUrl: 'templates/local-sticker.html',
+        templateUrl: 'templates/favorite-sticker.html',
         controller: 'LocalStickerController as stickerList'
     });
-
 }
 
 function run($translate, $translatePartialLoader) {
-    $translatePartialLoader.addPart('local');
+    $translatePartialLoader.addPart('favorite');
     $translate.refresh();
 }
 }());

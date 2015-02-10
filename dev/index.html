@@ -44,12 +44,14 @@
                         <div class="submenu"
                             slide-toggle="!menu.showSubmenu('favorite')">
                             <ion-item class="item-submenu"
+                                ui-sref="favorite.package({type: 'package'})"
                                 nav-clear menu-close>
                                 <span translate>
                                     MENU_PACKAGE
                                 </span>
                             </ion-item>
                             <ion-item class="item-submenu"
+                                ui-sref="favorite.sticker({type: 'sticker'})"
                                 nav-clear menu-close>
                                 <span translate>
                                     MENU_STICKER
@@ -68,13 +70,14 @@
                         <div class="submenu"
                             slide-toggle="!menu.showSubmenu('local')">
                             <ion-item class="item-submenu"
-                                ui-sref="local({type: 'package'})"
+                                ui-sref="local.package({type: 'package'})"
                                 nav-clear menu-close>
                                 <span translate>
                                     MENU_PACKAGE
                                 </span>
                             </ion-item>
                             <ion-item class="item-submenu"
+                                ui-sref="local.sticker({type: 'sticker'})"
                                 nav-clear menu-close>
                                 <span translate>
                                     MENU_STICKER

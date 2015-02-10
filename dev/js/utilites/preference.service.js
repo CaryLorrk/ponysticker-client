@@ -1,6 +1,6 @@
 (function () {
 angular
-.module('ponysticker.preference')
+.module('ponysticker.utilites')
 .service('preference', preference);
 
 function preference() {

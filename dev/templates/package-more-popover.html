@@ -6,13 +6,15 @@
         <div class="list">
             <a class="item" 
                 ng-if="!package.favorite"
-                ng-click="package.addFavorite()"
+                ng-click="package.addFavorite();
+                        package.morePopover.hide()"
                 translate>
                 PACKAGE_ADD_FAVORITE
             </a>
             <a class="item"
                 ng-if="package.favorite"
-                ng-click="package.removeFavorite()"
+                ng-click="package.removeFavorite();
+                        package.morePopover.hide()"
                 translate>
                 PACKAGE_REMOVE_FAVORITE
             </a>

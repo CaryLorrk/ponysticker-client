@@ -63,6 +63,7 @@ a.text-danger:hover {
 
 .thumbnails {
   text-align: center;
+  margin: 10px;
 }
 
 .thumbnail {
@@ -89,4 +90,14 @@ a.text-danger:hover {
 
 .half-window {
     height: 50%;
+}
+
+.tag {
+    margin: 4px;
+    padding: 2px;
+    font-size: 90%;
+    color: #FFF;
+    background-color: #080;
+    border-radius: 4px;
+    box-sizing: border-box;
 }

@@ -1,0 +1,22 @@
+<ion-view view-title="{{'FAVORITE_TITLE_'+favorite.type | translate}}">
+    <ion-nav-buttons side="left">
+        <!--Toggle button-->
+        <button class="button button-icon
+            button-clear ion-navicon"
+            menu-toggle="left" >
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content class="has-header has-footer">
+        <div class="list">
+            <a class="item item-thumbnail-left"
+                ng-repeat="pkg in favorite.items"
+                ui-sref="package({repo:'local', packageId: pkg.packageId})">
+                <img ng-src="{{package.getTabOnUrl(pkg)}}" alt="{{pkg.packageId}}">
+                <p>{{pkg.packageId}}</p>
+                <h2>{{package.getTitle(pkg)}}</h2>
+                <p>{{package.getAuthor(pkg)}}</p>
+            </a>
+        </div>
+    </ion-content>
+</ion-view>

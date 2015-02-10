@@ -34,6 +34,9 @@ function PreferenceController($ionicHistory, $translate, preference) {
     }
 
     function getSpace() {
+        if (ionic.Platform.isWebView()) {
+            return;
+        }
         if (navigator.webkitTemporaryStorage) {
             navigator
             .webkitTemporaryStorage
@@ -43,7 +46,7 @@ function PreferenceController($ionicHistory, $translate, preference) {
             }, function(e) {
                 //TODO
             });
-            return
+            return;
         }
 
         if (window.webkitStorageInfo) {
@@ -58,6 +61,12 @@ function PreferenceController($ionicHistory, $translate, preference) {
             });
             return;
         }
+
+        if (ionic.Platform.isIOS()) {
+            self.usedMB = 'unknown';
+            self.totalMB = '50';
+        }
+        
     }
 }
 }());

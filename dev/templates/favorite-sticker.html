@@ -1,0 +1,20 @@
+<ion-view view-title="{{'LOCAL_TITLE_'+favorite.type | translate}}">
+    <ion-nav-buttons side="left">
+        <!--Toggle button-->
+        <button class="button button-icon
+            button-clear ion-navicon"
+            menu-toggle="left" >
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content class="has-header has-footer">
+        <div class="thumbnails">
+            <div class="thumbnail" 
+                ng-repeat="sticker in favorite.items"
+                background-src="{{stickerList.getStickerUrl(sticker)}}"
+                ng-click="stickerList.showActionSheet(sticker)"
+                touch-active>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

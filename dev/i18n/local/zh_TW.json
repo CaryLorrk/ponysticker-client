@@ -1,4 +1,12 @@
 {
     "LOCAL_TITLE_package": "本機貼圖包",
-    "LOCAL_TITLE_sticker": "本機貼圖"
+    "LOCAL_TITLE_sticker": "本機貼圖",
+    "LOCAL_TAGS_COMPLETE": "完成",
+    "LOCAL_TAGS_CLEAR": "清空",
+    "LOCAL_CHOOSE_TAGS": "選擇標籤",
+    "LOCAL_SEARCH": "搜尋",
+    "LOCAL_SELECTED": "已選取標籤",
+    "LOCAL_UNSELECTED": "未選取標籤",
+    "LOCAL_PREV": "上一頁",
+    "LOCAL_NEXT": "下一頁"
 }

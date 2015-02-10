@@ -1,23 +1,26 @@
-<ion-view view-title="{{'TAGS_TITLE' | translate}}">
-    <!--Back button-->
-    <ion-nav-bar>
-        <ion-nav-back-button>
-        </ion-nav-back-button>
-    </ion-nav-bar>
-
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <div class="buttons">
+            <button class="button button-outline button-positive"
+                ng-click="local.tagModal.hide()"
+                translate>LOCAL_TAGS_COMPLETE</button>
+        </div>
+        <h1 class="title" translate>LOCAL_CHOOSE_TAGS</h1>
+        <div class="buttons">
+            <button class="button button-outline button-assertive"
+                ng-click="local.clearTags()"
+                translate>LOCAL_TAGS_CLEAR</button>
+        </div>
+    </ion-header-bar>
     <!--Search bar-->
     <div class="bar bar-subheader item-input-inset">
         <label class="item-input-wrapper">
             <i class="icon ion-search placeholder-icon"></i>
             <input type="search"
-            placeholder="{{'TAGS_SEARCH_OR_ADD' | translate}}"
-            ng-model="tags.query"
-            ng-keyup="tags.addTagInField($event)">
+            placeholder="{{'LOCAL_SEARCH' | translate}}"
+            ng-model="local.query">
 
         </label>
-        <button class="button button-clear button-icon ion-plus"
-            ng-click="tags.addTagDirectly()">
-        </button>
     </div>
 
     <!--Main content-->
@@ -28,8 +31,8 @@
                 TAGS_SELECTED
             </div>
             <a class="item item-icon-right animation-flip"
-                ng-repeat="tag in tags.getKeys(tags.selected) | filter:tags.query"
-                ng-click="tags.deleteTag(tag)">
+                ng-repeat="tag in local.getKeys(local.selected) | filter:local.query"
+                ng-click="local.deleteTag(tag)">
                 {{tag}}
                 <i class="icon ion-minus-circled text-danger"></i>
             </a>
@@ -39,11 +42,11 @@
                 TAGS_UNSELECTED
             </div>
             <a class="item item-icon-right animation-flip"
-                ng-repeat="tag in tags.getKeys(tags.unselected) | filter:tags.query"
-                ng-click="tags.addTag(tag)">
+                ng-repeat="tag in local.getKeys(local.unselected) | filter:local.query"
+                ng-click="local.addTag(tag)">
                 {{tag}}
                 <i class="icon ion-plus-circled text-info"></i>
             </a>
         </div>
     </ion-content>
-</ion-view>
+</ion-modal-view>

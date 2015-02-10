@@ -5,6 +5,7 @@ angular
     'pascalprecht.translate',
     'ponysticker.utilites',
     'ponysticker.menu',
+    'ponysticker.favorite',
     'ponysticker.local',
     'ponysticker.package',
     'ponysticker.download',

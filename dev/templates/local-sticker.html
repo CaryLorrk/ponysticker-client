@@ -1,0 +1,26 @@
+<ion-view view-title="{{'LOCAL_TITLE_'+local.type | translate}}">
+    <ion-nav-buttons side="left">
+        <!--Toggle button-->
+        <button class="button button-icon
+            button-clear ion-navicon"
+            menu-toggle="left" >
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <!--Tags button-->
+        <button class="button button-icon 
+            button-clear ion-pricetags"
+            ng-click="local.tagModal.show()"></button>
+    </ion-nav-buttons>
+
+    <ion-content class="has-header has-subheader has-footer">
+        <div class="thumbnails">
+            <div class="thumbnail" 
+                ng-repeat="sticker in local.getItems()"
+                ng-click="stickerList.showActionSheet(sticker)"
+                background-src="{{stickerList.getStickerUrl(sticker)}}"
+                touch-active>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

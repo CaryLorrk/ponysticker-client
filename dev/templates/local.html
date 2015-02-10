@@ -1,15 +1,28 @@
-<ion-view view-title="{{'LOCAL_TITLE_'+local.type | translate}}">
-    <ion-nav-buttons side="right">
-        <!--Tags button-->
-        <button class="button button-icon 
-            button-clear ion-pricetags"></button>
-    </ion-nav-buttons>
-    <ion-content>
-        <div class="list">
-            <div class="item"
-                ng-repeat="item in local.unselected">
-                {{item}}
-            </div>
+<ion-view>
+    <div class="bar bar-subheader">
+        <h5>
+            <span translate>LOCAL_SELECTED</span>:
+            <span class="tag"
+                ng-repeat="tag in local.getKeys(local.selected)">
+                {{tag}}
+            </span>
+        </h5>
+    </div>
+    <ion-nav-view>
+    </ion-nav-view>
+    <ion-footer-bar class="bar-positive">
+        <div class="button-bar">
+            <button class="button button-clear"
+                ng-click="local.goPrev()"
+                ng-disabled="local.page <= 1"
+                translate>LOCAL_PREV</button>
+            <button class="button button-clear" disabled>
+                {{local.page}}
+            </button>
+            <button class="button button-clear"
+                ng-click="local.goNext()"
+                ng-disabled="!local.checkHasNext()"
+                translate>LOCAL_NEXT</button>
         </div>
-    </ion-content>
+    </ion-footer-bar>
 </ion-view>
