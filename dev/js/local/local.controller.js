@@ -15,6 +15,7 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
 
     self.query = '';
     self.items = [];
+    self.itemImgs = {};
 
     self.showTagModal = showTagModal;
     self.addTag = addTag;
@@ -26,8 +27,16 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
     self.getItemId = getItemId;
     self.checkHasNext = checkHasNext;
     self.getItems = getItems;
+    self.getItemImgUrl = getItemImgUrl;
     
     init();
+
+    function getItemImgUrl(itemId) {
+        if (!self.itemImgs[itemId]) {
+            return '';
+        }
+        return 'data:image/jpg;base64,'+self.itemImgs[itemId];
+    }
 
     function getItems() {
         if ($.isEmptyObject(self.selected)) {
@@ -119,6 +128,7 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
             .success(function(res) {
                 self.items = res[0];
                 self.hasNext = res[1];
+                refreshItemImgs();
                 if (tag) {
                     refreshTags();
                 }
@@ -132,6 +142,7 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
                              self.pageSize, self.selected)
             .success(function(res) {
                 self.items = res;
+                refreshItemImgs();
                 if (tag) {
                     refreshTags();
                 }
@@ -140,6 +151,25 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
                 //TODO
             });
         }
+    }
+
+    function refreshItemImgs() {
+        var idName;
+        if (self.type === 'package') {
+            idName = 'packageId';
+        } else {
+            idName = 'id';
+        }
+        self.items.forEach(function(item, index) {
+            database
+            .getImg(self.type, item[idName])
+            .success(function(img) {
+                self.itemImgs[item[idName]] = img.base64;
+            })
+            .error(function() {
+                //TODO
+            });
+        });
     }
 
     function refreshTags() {

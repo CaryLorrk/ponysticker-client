@@ -220,11 +220,22 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state,
             } else {
                 self.remote =false;
                 self.favorite = self.meta.star;
-                self.tabOnBase64 = self.meta.tabOnBase64;
                 getStickersBase64();
+                getTabOnBase64();
             }
         })
         .error(function(e) {
+            //TODO
+        });
+    }
+
+    function getTabOnBase64() {
+        database
+        .getImg('package', self.packageId)
+        .success(function(img) {
+            self.tabOnBase64 = img.base64;
+        })
+        .error(function() {
             //TODO
         });
     }
@@ -241,9 +252,9 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state,
     function getStickersBase64() {
         self.meta.stickers.forEach(function(sticker) {
             database
-            .getMeta('sticker', sticker)
-            .success(function(meta) {
-                self.stickersBase64[sticker] = meta.base64;
+            .getImg('sticker', sticker)
+            .success(function(img) {
+                self.stickersBase64[sticker] = img.base64;
             })
             .error(function() {
                 //TODO

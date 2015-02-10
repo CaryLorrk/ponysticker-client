@@ -9,7 +9,10 @@ function database($q, $timeout) {
     var stickerObjStoreReady = false;
     var pkgTagObjStoreReady = false;
     var stickerTagObjStoreReady = false;
+    var pkgImgObjStoreReady = false;
+    var stickerImgObjStoreReady = false;
     var indexedDB = null;
+    var IDBKeyRange = null;
     self.dbVersion = 1;
 
     self.init = init;
@@ -25,11 +28,12 @@ function database($q, $timeout) {
     self.getMetasPagination = getMetasPagination;
     self.getMetasWithTags = getMetasWithTags;
     self.getMetaPaginationByStar = getMetaPaginationByStar;
+    self.getImg = getImg;
 
     function getMetaPaginationByStar(type, page, size) {
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
-            var starRange = window.IDBKeyRange.only(1);
+            var starRange = IDBKeyRange.only(1);
             var cursorReq;
                 cursorReq = self.db
                 .transaction([type], 'readonly')
@@ -87,10 +91,11 @@ function database($q, $timeout) {
             var tagsIds = [];
             tagsKey.forEach(function(tagKey, index) {
                 tagsIds[index] = {};
-                var tagRange = window.IDBKeyRange.only(tagKey);
+                var tagRange = IDBKeyRange.only(tagKey);
                 var cursorReq = tagObjStore.index('tag').openCursor(tagRange);
                 cursorReq.onsuccess = function(e) {
                     var cursor = e.target.result;
+                    console.log(cursor);
                     if (cursor) {
                         tagsIds[index][cursor.value.id] = true;
                         cursor.continue();
@@ -197,7 +202,7 @@ function database($q, $timeout) {
             var idsTags = [];
             ids.forEach(function(id, index) {
                 idsTags[index] = {};
-                var idRange = window.IDBKeyRange.only(id);
+                var idRange = IDBKeyRange.only(id);
                 var cursorReq = tagObjStore.index('id').openCursor(idRange);
                 cursorReq.onsuccess = function(e) {
                     var cursor = e.target.result;
@@ -296,7 +301,7 @@ function database($q, $timeout) {
         var objStoreName = type+'Tag';
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
-            var idRange = window.IDBKeyRange.only(id);
+            var idRange = IDBKeyRange.only(id);
             var transaction = self.db.transaction([objStoreName], 'readwrite');
             var objStore = transaction.objectStore(objStoreName);
             var cursorReq = objStore.index('id').openCursor(idRange);
@@ -328,7 +333,7 @@ function database($q, $timeout) {
         var objStoreName = type+'Tag';
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
-            var idKeyRange = window.IDBKeyRange.only(id);
+            var idKeyRange = IDBKeyRange.only(id);
             var transaction = self.db.transaction([objStoreName], 'readwrite');
             var objStore = transaction.objectStore(objStoreName);
             var cursorReq = objStore.index('id').openCursor(idKeyRange);
@@ -367,11 +372,13 @@ function database($q, $timeout) {
             var stickerObjStore = transaction.objectStore('sticker');
             var pkgTagObjStore = transaction.objectStore('packageTag');
             var stickerTagObjStore = transaction.objectStore('stickerTag');
+            var pkgImgObjStore = transaction.objectStore('packageImg');
+            var stickerImgObjStore = transaction.objectStore('stickerImg');
             var getReq = pkgObjStore.get(packageId);
             getReq.onsuccess = function(e) {
                 var meta = e.target.result;
                 meta.stickers.forEach(function(sticker) {
-                    var stickerIdRange = window.IDBKeyRange.only(sticker);
+                    var stickerIdRange = IDBKeyRange.only(sticker);
                     var stickerCursorReq = stickerTagObjStore.index('id').openCursor(stickerIdRange);
                     stickerCursorReq.onsuccess = function(e) {
                         var cursor = e.target.result;
@@ -380,11 +387,12 @@ function database($q, $timeout) {
                             cursor.continue();
                         }
                     };
+                    stickerImgObjStore.delete(sticker);
                     stickerObjStore.delete(sticker);
                 });
             };
 
-            var pkgIdRange = window.IDBKeyRange.only(packageId);
+            var pkgIdRange = IDBKeyRange.only(packageId);
             var pkgCursorReq = pkgTagObjStore.index('id').openCursor(pkgIdRange);
             pkgCursorReq.onsuccess = function(e) {
                 var cursor = e.target.result;
@@ -393,6 +401,7 @@ function database($q, $timeout) {
                     cursor.continue();
                 }
             };
+            pkgImgObjStore.delete(packageId);
             pkgObjStore.delete(packageId);
 
 
@@ -429,6 +438,25 @@ function database($q, $timeout) {
         return buildPromise(deferred.promise);
     }
 
+    function getImg(type, id) {
+        var deferred = $q.defer();
+        checkReadyBeforeWait(function() {
+            var getReq = self.db
+            .transaction(type+'Img')
+            .objectStore(type+'Img')
+            .get(id);
+
+            getReq.onsuccess = function(e) {
+                deferred.resolve(e.target.result);
+            };
+            getReq.onerror = function(e) {
+                deferred.reject(e);
+            };
+        });
+
+        return buildPromise(deferred.promise);
+    }
+
     function getMeta(type, id) {
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
@@ -451,15 +479,18 @@ function database($q, $timeout) {
     function addPackage(meta, tabOnBase64, stickersBase64) {
         var deferred = $q.defer();
         checkReady(function() {
-            var transaction = self.db.transaction(['package', 'sticker'], 'readwrite');
+            var transaction = self.db.transaction([
+                'package', 'sticker',
+                'packageImg', 'stickerImg'], 'readwrite');
             var pkgObjStore = transaction.objectStore('package');
+            var pkgImgObjStore = transaction.objectStore('packageImg');
             meta.date = (new Date()).getTime();
             meta.star = 0;
-            meta.tags = {};
-            meta.tabOnBase64 = tabOnBase64;
             pkgObjStore.add(meta);
+            pkgImgObjStore.add({packageId: meta.packageId, base64: tabOnBase64});
 
             var stickerObjStore = transaction.objectStore('sticker');
+            var stickerImgObjStore = transaction.objectStore('stickerImg');
             for (var key in stickersBase64) {
                 if (stickersBase64.hasOwnProperty(key)){
                     var sticker = {
@@ -467,10 +498,9 @@ function database($q, $timeout) {
                         packageId: meta.packageId,
                         recent: 0,
                         star: 0,
-                        tags: {},
-                        base64: stickersBase64[key]
                     };
                     stickerObjStore.add(sticker);
+                    stickerImgObjStore.add({id: sticker.id, base64: stickersBase64[key]});
                 }
             }
 
@@ -508,7 +538,9 @@ function database($q, $timeout) {
         return pkgObjStoreReady &&
             stickerObjStoreReady &&
             pkgTagObjStoreReady &&
-            stickerTagObjStoreReady;
+            stickerTagObjStoreReady &&
+            pkgImgObjStoreReady &&
+            stickerImgObjStoreReady;
     }
 
     function buildPromise(promise) {
@@ -532,8 +564,10 @@ function database($q, $timeout) {
     function init() {
         if (ionic.Platform.isWebView() || ionic.Platform.isIOS() || PonyModule.isSafari()) {
             indexedDB = window._indexedDB || window.indexedDB;
+            IDBKeyRange = window._IDBKeyRange || window.IDBKeyRange;
         } else {
             indexedDB = window.indexedDB || window._indexedDB;
+            IDBKeyRange = window.IDBKeyRange || window._IDBKeyRange;
         }
 
         if (!indexedDB) {
@@ -563,6 +597,14 @@ function database($q, $timeout) {
                     //TODO
                 };
 
+                var pkgImgObjStore = self.db.createObjectStore('packageImg', {keyPath: 'packageId'});
+                pkgImgObjStore.transaction.oncomplete = function(e) {
+                    pkgImgObjStoreReady = true;
+                };
+                pkgImgObjStore.transaction.onerror = function(e) {
+                    //TODO
+                };
+
 
                 var stickerObjStore = self.db.createObjectStore('sticker', {keyPath: 'id'});
                 stickerObjStore.createIndex('packageId', 'packageId', {unique: false});
@@ -584,6 +626,14 @@ function database($q, $timeout) {
                 stickerTagObjStore.transaction.onerror = function(e) {
                     //TODO
                 };
+
+                var stickerImgObjStore = self.db.createObjectStore('stickerImg', {keyPath: 'id'});
+                stickerImgObjStore.transaction.oncomplete = function(e) {
+                    stickerImgObjStoreReady = true;
+                };
+                stickerImgObjStore.transaction.onerror = function(e) {
+                    //TODO
+                };
             }
         }; 
         openReq.onsuccess = function(e) {
@@ -591,6 +641,8 @@ function database($q, $timeout) {
             stickerObjStoreReady = true;
             pkgTagObjStoreReady = true;
             stickerTagObjStoreReady = true;
+            pkgImgObjStoreReady = true;
+            stickerImgObjStoreReady = true;
             self.db = e.target.result;
         };
 

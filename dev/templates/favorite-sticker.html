@@ -11,7 +11,7 @@
         <div class="thumbnails">
             <div class="thumbnail" 
                 ng-repeat="sticker in favorite.items"
-                background-src="{{stickerList.getStickerUrl(sticker)}}"
+                background-src="{{favorite.getItemImgUrl(sticker.id)}}"
                 ng-click="stickerList.showActionSheet(sticker)"
                 touch-active>
             </div>
