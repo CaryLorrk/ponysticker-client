@@ -30,7 +30,7 @@ function database($q, $timeout) {
     self.getMetaPaginationByStar = getMetaPaginationByStar;
     self.getImg = getImg;
 
-    function getMetaPaginationByStar(type, page, size) {
+    function getMetaPaginationByStar(type) {
         var deferred = $q.defer();
         checkReadyBeforeWait(function() {
             var starRange = IDBKeyRange.only(1);
@@ -45,35 +45,15 @@ function database($q, $timeout) {
                 deferred.reject(e);
             };
 
-            var count = 0;
             var items = [];
-            var advancing = true;
-            var hasNext = true;
 
             cursorReq.onsuccess = function(e) {
                 var cursor = e.target.result;
                 if (cursor) {
-                    if (advancing) {
-                        if (page === 1) {
-                            items.push(cursor.value);
-                            count += 1;
-                            cursor.continue();
-                        } else {
-                            cursor.advance((page-1)*size);
-                        }
-                        advancing = false;
-                    } else {
-                        if (count < size) {
-                            items.push(cursor.value);
-                            count += 1;
-                            cursor.continue();
-                        } else {
-                            deferred.resolve([items, hasNext]);
-                        }
-                    }
+                    items.push(cursor.value);
+                    cursor.continue();
                 } else {
-                    hasNext = false;
-                    deferred.resolve([items, hasNext]);
+                    deferred.resolve(items);
                 }
             };
         });
@@ -81,7 +61,7 @@ function database($q, $timeout) {
 
     }
 
-    function getMetasWithTags(type, page, size, tags) {
+    function getMetasWithTags(type, tags) {
         var deferred = $q.defer();
         var tagsKey = Object.keys(tags);
         checkReadyBeforeWait(function() {
@@ -95,7 +75,6 @@ function database($q, $timeout) {
                 var cursorReq = tagObjStore.index('tag').openCursor(tagRange);
                 cursorReq.onsuccess = function(e) {
                     var cursor = e.target.result;
-                    console.log(cursor);
                     if (cursor) {
                         tagsIds[index][cursor.value.id] = true;
                         cursor.continue();

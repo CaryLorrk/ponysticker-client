@@ -44,31 +44,16 @@
                     translate>
                     PACKAGE_DELETE
                 </button>
-
-
-            </div>
-
-            <!--Card bottom-->
-            <div class="item item-body">
-                <!--Previews-->
-                <div class="thumbnails">
-                    <div class="thumbnail animation-fade" 
-                        ng-repeat="sticker in package.stickers"
-                        background-src="{{package.getStickerUrl(sticker)}}"
-                        ng-click="package.showActionSheet(sticker)"
-                        touch-active>
-                    </div>
-                    <p class="text-info"
-                        ng-if="package.hasMore"
-                        translate>DOWNLOAD_SCROLL_FOR_MORE</p>  
-                </div>
             </div>
         </div>
-        <ion-infinite-scroll
-            on-infinite="package.loadMore()"
-            ng-if="package.hasMore"
-            distance="10%"
-            immediate-check="true">
-        </ion-infinite-scroll>
+        <!--Previews-->
+        <div class="item item-avatar thumbnail"
+            collection-repeat="sticker in package.meta.stickers"
+            collection-item-width="'33%'"
+            collection-item-height="'33%'"
+            background-src="{{package.getStickerUrl(sticker)}}"
+            ng-click="package.showActionSheet(sticker)"
+            touch-active>
+        </div>
     </ion-content>
 </ion-view>

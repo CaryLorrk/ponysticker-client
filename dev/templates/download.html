@@ -43,8 +43,10 @@
         <!--Package list-->
         <div class="list">
             <a class="item item-thumbnail-left animation-fade"
-                ng-repeat="pkg in download.pkgList"
-                ui-sref="package({repo:download.repo, packageId: pkg.packageId})">
+                    collection-repeat="pkg in download.pkgList"
+                    collection-item-width="'100%'"
+                    collection-item-height="'100px'"
+                    ui-sref="package({repo:download.repo, packageId: pkg.packageId})">
                 <img ng-src="{{download.pkgTabList[$index]}}" alt="{{pkg.packageId}}">
                 <p>{{pkg.packageId}}</p>
                 <h2>{{download.getTitle(pkg)}}</h2>

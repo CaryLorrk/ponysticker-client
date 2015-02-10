@@ -9,7 +9,7 @@
  * Copyright 2014 Drifty Co.
  * http://drifty.com/
  *
- * Ionic, v1.0.0-beta.14-nightly-994
+ * Ionic, v1.0.0-beta.14-nightly-1013
  * A powerful HTML5 mobile app framework.
  * http://ionicframework.com/
  *
@@ -25,7 +25,7 @@
 // build processes may have already created an ionic obj
 window.ionic = window.ionic || {};
 window.ionic.views = {};
-window.ionic.version = '1.0.0-beta.14-nightly-994';
+window.ionic.version = '1.0.0-beta.14-nightly-1013';
 
 (function (ionic) {
 
@@ -429,6 +429,7 @@ window.ionic.version = '1.0.0-beta.14-nightly-994';
         }
       }
     }
+
   };
 
   //Shortcuts
@@ -4758,7 +4759,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
     self.touchEnd = function(e) {
       if (!self.__isDown) return;
 
-      self.doTouchEnd(e.timeStamp);
+      self.doTouchEnd(e, e.timeStamp);
       self.__isDown = false;
       self.__hasStarted = false;
       self.__isSelectable = true;
@@ -4830,7 +4831,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
           return;
         }
 
-        self.doTouchEnd(e.timeStamp);
+        self.doTouchEnd(e, e.timeStamp);
 
         mousedown = false;
       };
@@ -5595,6 +5596,9 @@ ionic.views.Scroll = ionic.views.View.inherit({
   doTouchStart: function(touches, timeStamp) {
     var self = this;
 
+    // remember if the deceleration was just stopped
+    self.__decStopped = !!(self.__isDecelerating || self.__isAnimating);
+
     self.hintResize();
 
     if (timeStamp instanceof Date) {
@@ -5712,6 +5716,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     // Are we already is dragging mode?
     if (self.__isDragging) {
+        self.__decStopped = false;
 
       // Compute move distance
       var moveX = currentTouchLeft - self.__lastTouchLeft;
@@ -5877,7 +5882,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
   /**
    * Touch end handler for scrolling support
    */
-  doTouchEnd: function(timeStamp) {
+  doTouchEnd: function(e, timeStamp) {
     if (timeStamp instanceof Date) {
       timeStamp = timeStamp.valueOf();
     }
@@ -5947,6 +5952,13 @@ ionic.views.Scroll = ionic.views.View.inherit({
       } else if ((timeStamp - self.__lastTouchMove) > 100) {
         self.__scrollingComplete();
       }
+
+    } else if (self.__decStopped) {
+      // the deceleration was stopped
+      // user flicked the scroll fast, and stop dragging, then did a touchstart to stop the srolling
+      // tell the touchend event code to do nothing, we don't want to actually send a click
+      e.isTapHandled = true;
+      self.__decStopped = false;
     }
 
     // If this was a slower move it is per default non decelerated, but this
@@ -41082,7 +41094,7 @@ angular.module('ui.router.state')
  * Copyright 2014 Drifty Co.
  * http://drifty.com/
  *
- * Ionic, v1.0.0-beta.14-nightly-994
+ * Ionic, v1.0.0-beta.14-nightly-1013
  * A powerful HTML5 mobile app framework.
  * http://ionicframework.com/
  *
@@ -41511,7 +41523,7 @@ IonicModule
         parentGet,
         unwatch;
 
-      switch(mode) {
+      switch (mode) {
         case '@':
           if (!attrs[attrName]) {
             return;
@@ -41934,19 +41946,27 @@ function($rootScope, $timeout) {
        * vertically: Items are laid out with primarySize being height,
        * secondarySize being width.
        */
+      var self = this;
       var primaryPos = 0;
       var secondaryPos = 0;
-      var secondaryScrollSize = this.secondaryScrollSize();
+      var secondaryScrollSize = self.secondaryScrollSize();
       var previousItem;
+      var i, len;
 
-      this.dataSource.beforeSiblings && this.dataSource.beforeSiblings.forEach(calculateSize, this);
-      var beforeSize = primaryPos + (previousItem ? previousItem.primarySize : 0);
+      // Skip past every beforeSibling, we want our list to start after those.
+      for (i = 0, len = (self.dataSource.beforeSiblings || []).length; i < len; i++) {
+        calculateSize(self.dataSource.beforeSiblings[i]);
+      }
+      var beforeSize = primaryPos + (previousItem && previousItem.primarySize || 0);
 
       primaryPos = secondaryPos = 0;
       previousItem = null;
 
-      var dimensions = this.dataSource.dimensions.map(calculateSize, this);
-      var totalSize = primaryPos + (previousItem ? previousItem.primarySize : 0);
+      var dimensions = [];
+      for (i = 0, len = self.dataSource.dimensions.length; i < len; i++) {
+        dimensions.push( calculateSize(self.dataSource.dimensions[i]) );
+      }
+      var totalSize = primaryPos + (previousItem && previousItem.primarySize || 0);
 
       return {
         beforeSize: beforeSize,
@@ -41960,12 +41980,12 @@ function($rootScope, $timeout) {
         //the dataSource
         var rect = {
           //Get the height out of the dimension object
-          primarySize: this.primaryDimension(dim),
+          primarySize: self.primaryDimension(dim),
           //Max out the item's width to the width of the scrollview
-          secondarySize: Math.min(this.secondaryDimension(dim), secondaryScrollSize)
+          secondarySize: Math.min(self.secondaryDimension(dim), secondaryScrollSize)
         };
 
-        //If this isn't the first item
+        //If self isn't the first item
         if (previousItem) {
           //Move the item's x position over by the width of the previous item
           secondaryPos += previousItem.secondarySize;
@@ -41986,6 +42006,7 @@ function($rootScope, $timeout) {
         return rect;
       }
     },
+
     resize: function() {
       var result = this.calculateDimensions();
       this.dimensions = result.dimensions;
@@ -42056,15 +42077,16 @@ function($rootScope, $timeout) {
      * to fully optimize it.
      */
     getIndexForScrollValue: function(i, scrollValue) {
+      var dimensions = this.dimensions;
       var rect;
       //Scrolling up
-      if (scrollValue <= this.dimensions[i].primaryPos) {
-        while ( (rect = this.dimensions[i - 1]) && rect.primaryPos > scrollValue) {
+      if (scrollValue <= dimensions[i].primaryPos) {
+        while ( (rect = dimensions[i - 1]) && rect.primaryPos > scrollValue) {
           i--;
         }
       //Scrolling down
       } else {
-        while ((rect = this.dimensions[i + 1]) && rect.primaryPos < scrollValue) {
+        while ((rect = dimensions[i + 1]) && rect.primaryPos < scrollValue) {
           i++;
         }
       }
@@ -42118,15 +42140,10 @@ function($rootScope, $timeout) {
         doRender(i, rect);
         i++;
       }
-
       // Render two extra items at the end as a buffer
-      if (self.dimensions[i]) {
-        doRender(i, self.dimensions[i]);
-        i++;
-      }
-      if (self.dimensions[i]) {
-        doRender(i, self.dimensions[i]);
-      }
+      if ( (rect = self.dimensions[i]) ) doRender(i++, rect);
+      if ( (rect = self.dimensions[i]) ) doRender(i, rect);
+
       var renderEndIndex = i;
 
       // Remove any items that were rendered and aren't visible anymore
@@ -43791,7 +43808,7 @@ function($ionicLoadingConfig, $ionicBody, $ionicTemplateLoader, $ionicBackdrop, 
             if (self.isShown) {
               self.element.addClass('visible');
               ionic.requestAnimationFrame(function() {
-                if(self.isShown) {
+                if (self.isShown) {
                   self.element.addClass('active');
                   $ionicBody.addClass('loading-active');
                 }
@@ -44462,12 +44479,12 @@ IonicModule
  *   var template = '<ion-popover-view><ion-header-bar> <h1 class="title">My Popover Title</h1> </ion-header-bar> <ion-content> Hello! </ion-content></ion-popover-view>';
  *
  *   $scope.popover = $ionicPopover.fromTemplate(template, {
- *     scope: $scope,
+ *     scope: $scope
  *   });
  *
  *   // .fromTemplateUrl() method
  *   $ionicPopover.fromTemplateUrl('my-popover.html', {
- *     scope: $scope,
+ *     scope: $scope
  *   }).then(function(popover) {
  *     $scope.popover = popover;
  *   });
@@ -45484,7 +45501,7 @@ IonicModule
    *  - If false or 0 is given, the edge drag threshold is disabled, and dragging from anywhere on the content is allowed.
    * @returns {boolean} Whether the drag can start only from within the edge of screen threshold.
    */
-  'edgeDragThreshold',
+  'edgeDragThreshold'
   /**
    * @ngdoc method
    * @name $ionicSideMenuDelegate#$getByHandle
@@ -45511,7 +45528,7 @@ IonicModule
  * @usage
  *
  * ```html
- * <body ng-controller="MyCtrl">
+ * <ion-view>
  *   <ion-slide-box>
  *     <ion-slide>
  *       <div class="box blue">
@@ -45524,7 +45541,7 @@ IonicModule
  *       </div>
  *     </ion-slide>
  *   </ion-slide-box>
- * </body>
+ * </ion-view>
  * ```
  * ```js
  * function MyCtrl($scope, $ionicSlideBoxDelegate) {
@@ -45599,7 +45616,7 @@ IonicModule
    */
   'slidesCount',
   'count',
-  'loop',
+  'loop'
   /**
    * @ngdoc method
    * @name $ionicSlideBoxDelegate#$getByHandle
@@ -46075,7 +46092,7 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
 
           if (viewTransition.shouldAnimate) {
             // attach transitionend events (and fallback timer)
-            enteringEle.on(TRANSITIONEND_EVENT, transitionComplete);
+            enteringEle.on(TRANSITIONEND_EVENT, completeOnTransitionEnd);
             enteringEle.data(DATA_FALLBACK_TIMER, $timeout(transitionComplete, defaultTimeout));
             $ionicClickBlock.show(defaultTimeout);
           }
@@ -46114,7 +46131,7 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
               run: viewTransition.run,
               cancel: function(shouldAnimate) {
                 if (shouldAnimate) {
-                  enteringEle.on(TRANSITIONEND_EVENT, cancelTransition);
+                  enteringEle.on(TRANSITIONEND_EVENT, cancelOnTransitionEnd);
                   enteringEle.data(DATA_FALLBACK_TIMER, $timeout(cancelTransition, defaultTimeout));
                   $ionicClickBlock.show(defaultTimeout);
                 } else {
@@ -46153,11 +46170,17 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
             }
           }
 
+          // Make sure that transitionend events bubbling up from children won't fire
+          // transitionComplete. Will only go forward if ev.target == the element listening.
+          function completeOnTransitionEnd(ev) {
+            if (ev.target !== this) return;
+            transitionComplete();
+          }
           function transitionComplete() {
             if (transitionComplete.x) return;
             transitionComplete.x = true;
 
-            enteringEle.off(TRANSITIONEND_EVENT, transitionComplete);
+            enteringEle.off(TRANSITIONEND_EVENT, completeOnTransitionEnd);
             $timeout.cancel(enteringEle.data(DATA_FALLBACK_TIMER));
             leavingEle && $timeout.cancel(leavingEle.data(DATA_FALLBACK_TIMER));
 
@@ -46184,10 +46207,16 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
             nextTransition = nextDirection = enteringView = leavingView = enteringEle = leavingEle = null;
           }
 
+          // Make sure that transitionend events bubbling up from children won't fire
+          // transitionComplete. Will only go forward if ev.target == the element listening.
+          function cancelOnTransitionEnd(ev) {
+            if (ev.target !== this) return;
+            cancelTransition();
+          }
           function cancelTransition() {
             navViewAttr(enteringEle, VIEW_STATUS_CACHED);
             navViewAttr(leavingEle, VIEW_STATUS_ACTIVE);
-            enteringEle.off(TRANSITIONEND_EVENT, cancelTransition);
+            enteringEle.off(TRANSITIONEND_EVENT, cancelOnTransitionEnd);
             $timeout.cancel(enteringEle.data(DATA_FALLBACK_TIMER));
             ionicViewSwitcher.transitionEnd([navViewCtrl]);
           }
@@ -47068,7 +47097,7 @@ function($scope, $element, $attrs, $compile, $timeout, $ionicNavBarDelegate, $io
     ionic.DomUtil.cachedAttr(containerEle, 'nav-bar', isActive ? 'active' : 'cached');
 
     var alignTitle = $attrs.alignTitle || $ionicConfig.navBar.alignTitle();
-    var headerBarEle = jqLite('<ion-header-bar>').addClass($attrs.class).attr('align-title', alignTitle);
+    var headerBarEle = jqLite('<ion-header-bar>').addClass($attrs['class']).attr('align-title', alignTitle);
     if (isDefined($attrs.noTapScroll)) headerBarEle.attr('no-tap-scroll', $attrs.noTapScroll);
     var titleEle = jqLite('<div class="title title-' + alignTitle + '">');
     var navEle = {};
@@ -47532,6 +47561,7 @@ function($scope, $element, $attrs, $compile, $controller, $ionicNavBarDelegate, 
   var transitionDuration, transitionTiming;
 
   self.scope = $scope;
+  self.element = $element;
 
   self.init = function() {
     var navViewName = $attrs.name || '';
@@ -47902,7 +47932,7 @@ function($scope, $element, $attrs, $compile, $controller, $ionicNavBarDelegate, 
       ionic.offGesture(deregDragStart, 'dragstart', onDragStart);
       ionic.offGesture(deregDrag, 'drag', onDrag);
       ionic.offGesture(deregRelease, 'release', onRelease);
-      viewTransition = associatedNavBarCtrl = null;
+      self.element = viewTransition = associatedNavBarCtrl = null;
     });
   };
 
@@ -47958,7 +47988,9 @@ IonicModule
       $attrs.$set('pullingIcon', 'ion-android-arrow-down');
     }
 
-    $scope.showSpinner = !isDefined($attrs.refreshingIcon);
+    $scope.showSpinner = !isDefined($attrs.refreshingIcon) && $attrs.spinner != 'none';
+
+    $scope.showIcon = isDefined($attrs.refreshingIcon);
 
     $ionicBind($scope, $attrs, {
       pullingIcon: '@',
@@ -48049,7 +48081,7 @@ IonicModule
 
       isDragging = true;
       // overscroll according to the user's drag so far
-      overscroll(parseInt((deltaY - dragOffset)/3, 10));
+      overscroll(parseInt((deltaY - dragOffset) / 3, 10));
 
       // update the icon accordingly
       if (!activated && lastOverscroll > ptrThreshold) {
@@ -48932,7 +48964,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
         return {
           y1: spinnerName == 'ios' ? 17 : 12,
           y2: spinnerName == 'ios' ? 29 : 20,
-          t: TRANSLATE32 + ' rotate(' + (30 * i + (i < 6 ? 180: -180)) + ')',
+          t: TRANSLATE32 + ' rotate(' + (30 * i + (i < 6 ? 180 : -180)) + ')',
           a: [{
             fn: function() {
               return {
@@ -49238,9 +49270,9 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
 
   function easeInOutCubic(t, c) {
     t /= c / 2;
-    if (t < 1) return 1/2*t*t*t;
+    if (t < 1) return 1 / 2 * t * t * t;
     t -= 2;
-    return 1/2*(t*t*t + 2);
+    return 1 / 2 * (t * t * t + 2);
   }
 
 
@@ -49262,7 +49294,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody, $io
       var container = document.createElement('div');
       createSvgElement('svg', {
         viewBox: '0 0 64 64',
-        g: [ spinners[spinnerName] ]
+        g: [spinners[spinnerName]]
       }, container, spinnerName);
 
       // Specifically for animations to work,
@@ -49864,27 +49896,31 @@ function($collectionRepeatManager, $collectionDataSource, $parse) {
       function rerender(value) {
         var beforeSiblings = [];
         var afterSiblings = [];
+        var collectionRepeatNode = $element[0];
         var before = true;
+        var children = scrollViewContent.children;
+        var width, height, el, child;
 
-        forEach(scrollViewContent.children, function(node, i) {
-          if (ionic.DomUtil.elementIsDescendant($element[0], node, scrollViewContent)) {
+        // Loop through all of the children of scrollViewContent. Put every child BEFORE
+        // the collectionRepeatNode in `beforeSiblings`, and all of the children AFTER
+        // the collectionRepeatNode in `afterSiblings`.
+        for (var i = 0; (child = children[i]); i++) {
+          if (child.hasAttribute('collection-repeat-ignore')) continue;
+          if (child.contains(collectionRepeatNode)) {
+            // Once we reach the collectionRepeatNode, we're now counting siblings AFTER the repeater.
             before = false;
-          } else {
-            if (node.hasAttribute('collection-repeat-ignore')) return;
-            var width = node.offsetWidth;
-            var height = node.offsetHeight;
-            if (width && height) {
-              var element = jqLite(node);
-              (before ? beforeSiblings : afterSiblings).push({
-                width: node.offsetWidth,
-                height: node.offsetHeight,
-                element: element,
-                scope: element.isolateScope() || element.scope(),
-                isOutside: true
-              });
-            }
+            continue;
           }
-        });
+          if ( (width = child.offsetWidth) && (height = child.offsetHeight) ) {
+            (before ? beforeSiblings : afterSiblings).push({
+              width: width,
+              height: height,
+              element: (el = jqLite(child)),
+              scope: el.isolateScope() || el.scope(),
+              isOutside: true
+            });
+          }
+        }
 
         scrollView.resize();
         dataSource.setData(value, beforeSiblings, afterSiblings);
@@ -49892,10 +49928,18 @@ function($collectionRepeatManager, $collectionDataSource, $parse) {
       }
 
       var requiresRerender;
+      var lastDim = {};
+      var newDim = {};
       function rerenderOnResize() {
-        if ($scope.$$disconnected) return;
-        rerender(listExprParsed($scope));
-        requiresRerender = (!scrollViewContent.clientWidth && !scrollViewContent.clientHeight);
+        newDim = {
+          width: scrollViewContent.clientWidth,
+          height: scrollViewContent.clientHeight
+        };
+        if (!angular.equals(lastDim, newDim) && !$scope.$$disconnected) {
+          rerender(listExprParsed($scope));
+        }
+        requiresRerender = (!newDim.width && !newDim.height);
+        lastDim = newDim;
       }
 
       function viewEnter() {
@@ -50152,7 +50196,7 @@ IonicModule
 
       function checkAsideExpose() {
         var mq = $attr.exposeAsideWhen == 'large' ? '(min-width:768px)' : $attr.exposeAsideWhen;
-        sideMenuCtrl.exposeAside( $window.matchMedia(mq).matches );
+        sideMenuCtrl.exposeAside($window.matchMedia(mq).matches);
         sideMenuCtrl.activeAsideResizing(false);
       }
 
@@ -50162,9 +50206,7 @@ IonicModule
       }
 
       var debouncedCheck = ionic.debounce(function() {
-        $scope.$apply(function(){
-          checkAsideExpose();
-        });
+        $scope.$apply(checkAsideExpose);
       }, 300, false);
 
       checkAsideExpose();
@@ -51093,7 +51135,7 @@ IonicModule
       var keyboardHeight = e.keyboardHeight || e.detail.keyboardHeight;
       element.css('bottom', keyboardHeight + "px");
       scrollCtrl = element.controller('$ionicScroll');
-      if ( scrollCtrl ) {
+      if (scrollCtrl) {
         scrollCtrl.scrollView.__container.style.bottom = keyboardHeight + keyboardAttachGetClientHeight(element[0]) + "px";
       }
     }
@@ -51104,7 +51146,7 @@ IonicModule
       }
 
       element.css('bottom', '');
-      if ( scrollCtrl ) {
+      if (scrollCtrl) {
         scrollCtrl.scrollView.__container.style.bottom = '';
       }
     }
@@ -51428,7 +51470,7 @@ IonicModule
     restrict: 'E',
     transclude: true,
     replace: true,
-    controller: [function(){}],
+    controller: [function() {}],
     template: '<div class="modal-backdrop">' +
                 '<div class="modal-wrapper" ng-transclude></div>' +
                 '</div>'
@@ -52179,7 +52221,7 @@ IonicModule
  * <ion-radio ng-model="choice" ng-value="'B'">Choose B</ion-radio>
  * <ion-radio ng-model="choice" ng-value="'C'">Choose C</ion-radio>
  * ```
- * 
+ *
  * @param {string=} name The name of the radio input.
  * @param {expression=} value The value of the radio input.
  * @param {boolean=} disabled The state of the radio input.
@@ -52204,7 +52246,10 @@ IonicModule
       '</label>',
 
     compile: function(element, attr) {
-      if(attr.icon) element.children().eq(2).removeClass('ion-checkmark').addClass(attr.icon);
+      if (attr.icon) {
+        element.children().eq(2).removeClass('ion-checkmark').addClass(attr.icon);
+      }
+
       var input = element.find('input');
       forEach({
           'name': attr.name,
@@ -52283,7 +52328,8 @@ IonicModule
  * Default: 'ion-android-arrow-down'.
  * @param {string=} spinner The {@link ionic.directive:ionSpinner} icon to display
  * after user lets go of the refresher. The SVG {@link ionic.directive:ionSpinner}
- * is now the default, replacing rotating font icons.
+ * is now the default, replacing rotating font icons. Set to `none` to disable both the
+ * spinner and the icon.
  * @param {string=} refreshing-icon The font icon to display after user lets go of the
  * refresher. This is depreicated in favor of the SVG {@link ionic.directive:ionSpinner}.
  * @param {boolean=} disable-pulling-rotation Disables the rotation animation of the pulling
@@ -52307,7 +52353,7 @@ IonicModule
         '<div class="text-pulling" ng-bind-html="pullingText"></div>' +
         '<div class="icon-refreshing">' +
           '<ion-spinner ng-if="showSpinner" icon="{{spinner}}"></ion-spinner>' +
-          '<i ng-if="!showSpinner" class="icon {{refreshingIcon}}"></i>' +
+          '<i ng-if="showIcon" class="icon {{refreshingIcon}}"></i>' +
         '</div>' +
         '<div class="text-refreshing" ng-bind-html="refreshingText"></div>' +
       '</div>' +
@@ -52824,7 +52870,7 @@ IonicModule
           $ionicBody.enableClass(isAsideExposed, 'aside-open');
         });
 
-        $scope.$on('$ionicView.beforeEnter', function(ev, d){
+        $scope.$on('$ionicView.beforeEnter', function(ev, d) {
           if (d.historyId) {
             $scope.$activeHistoryId = d.historyId;
           }
@@ -52871,7 +52917,7 @@ IonicModule
  * @param {boolean=} does-continue Whether the slide box should loop.
  * @param {boolean=} auto-play Whether the slide box should automatically slide. Default true if does-continue is true.
  * @param {number=} slide-interval How many milliseconds to wait to change slides (if does-continue is true). Defaults to 4000.
- * @param {boolean=} show-pager Whether a pager should be shown for this slide box.
+ * @param {boolean=} show-pager Whether a pager should be shown for this slide box. Accepts expressions via `show-pager="{{shouldShow()}}"`.
  * @param {expression=} pager-click Expression to call when a pager is clicked (if show-pager is true). Is passed the 'index' variable.
  * @param {expression=} on-slide-changed Expression called whenever the slide is changed.  Is passed an '$index' variable.
  * @param {expression=} active-slide Model to bind the current slide to.
@@ -52928,7 +52974,7 @@ function($timeout, $compile, $ionicSlideBoxDelegate, $ionicHistory) {
       slider.enableSlide($scope.$eval($attrs.disableScroll) !== true);
 
       $scope.$watch('activeSlide', function(nv) {
-        if(isDefined(nv)){
+        if (isDefined(nv)) {
           slider.slide(nv);
         }
       });
@@ -52974,12 +53020,20 @@ function($timeout, $compile, $ionicSlideBoxDelegate, $ionicHistory) {
     '</div>',
 
     link: function($scope, $element, $attr, slideBoxCtrl) {
-      // If the pager should show, append it to the slide box
-      if($scope.$eval($scope.showPager) !== false) {
-        var childScope = $scope.$new();
-        var pager = jqLite('<ion-pager></ion-pager>');
-        $element.append(pager);
-        $compile(pager)(childScope);
+      $attr.$observe('showPager', function(show) {
+        show = $scope.$eval(show);
+        getPager().toggleClass('hide', !show);
+      });
+
+      var pager;
+      function getPager() {
+        if (!pager) {
+          var childScope = $scope.$new();
+          pager = jqLite('<ion-pager></ion-pager>');
+          $element.append(pager);
+          pager = $compile(pager)(childScope);
+        }
+        return pager;
       }
     }
   };
@@ -52992,7 +53046,7 @@ function($timeout, $compile, $ionicSlideBoxDelegate, $ionicHistory) {
       element.addClass('slider-slide');
       return function($scope, $element, $attr) {
       };
-    },
+    }
   };
 })
 
@@ -53006,8 +53060,8 @@ function($timeout, $compile, $ionicSlideBoxDelegate, $ionicHistory) {
       var selectPage = function(index) {
         var children = $element[0].children;
         var length = children.length;
-        for(var i = 0; i < length; i++) {
-          if(i == index) {
+        for (var i = 0; i < length; i++) {
+          if (i == index) {
             children[i].classList.add('active');
           } else {
             children[i].classList.remove('active');
@@ -53655,7 +53709,7 @@ function($timeout, $ionicConfig) {
         }
       });
 
-      if(attr.toggleClass) {
+      if (attr.toggleClass) {
         element[0].getElementsByTagName('label')[0].classList.add(attr.toggleClass);
       }
 

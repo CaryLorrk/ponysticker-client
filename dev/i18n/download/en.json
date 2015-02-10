@@ -14,6 +14,5 @@
     "DOWNLOAD_ID": "ID",
     "DOWNLOAD_DATE": "Date",
     "DOWNLOAD_RELOAD": "Reload",
-    "DOWNLOAD_LOADING_ERROR": "Oooops, something is wrong. Please reload.",
-    "DOWNLOAD_SCROLL_FOR_MORE": "Scroll for more"
+    "DOWNLOAD_LOADING_ERROR": "Oooops, something is wrong. Please reload."
 }

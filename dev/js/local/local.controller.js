@@ -3,12 +3,11 @@ angular
 .module('ponysticker.local')
 .controller('LocalController', LocalController);
 
-function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, database, type) {
+function LocalController($scope, $timeout, $ionicModal, $ionicScrollDelegate, preference, database, type) {
     var self = this;
     self.type = type;
     self.selected = {};
     self.unselected = {};
-    self.getKeys = getKeys;
     self.page = 1;
     self.hasNext = false;
     self.pageSize = preference.getPageSize();
@@ -22,14 +21,30 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
     self.deleteTag = deleteTag;
     self.clearTags = clearTags;
     self.getKeys = getKeys;
-    self.goPrev = goPrev;
-    self.goNext = goNext;
     self.getItemId = getItemId;
-    self.checkHasNext = checkHasNext;
-    self.getItems = getItems;
     self.getItemImgUrl = getItemImgUrl;
+    self.loadMore = loadMore;
     
     init();
+
+    function loadMore() {
+        database
+        .getMetasPagination(self.type, self.page+1, self.pageSize)
+        .success(function(res) {
+            var skip = self.items.length;
+            self.items =self.items.concat(res[0]);
+            refreshItemImgs(skip);
+            self.hasNext = res[1];
+            self.page += 1;
+
+            $timeout(function() {
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }, 100);
+        })
+        .error(function() {
+            //TODO
+        });
+    }
 
     function getItemImgUrl(itemId) {
         if (!self.itemImgs[itemId]) {
@@ -38,24 +53,6 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
         return 'data:image/jpg;base64,'+self.itemImgs[itemId];
     }
 
-    function getItems() {
-        if ($.isEmptyObject(self.selected)) {
-            return self.items;
-        } else {
-            return self.items.slice(
-                (self.page-1)*self.pageSize,
-                self.page*self.pageSize);
-        }
-
-    }
-
-    function checkHasNext() {
-        if ($.isEmptyObject(self.selected)) {
-            return self.hasNext;
-        } else {
-            return self.page < self.items.length / self.pageSize ;
-        }
-    }
 
     function getItemId(item) {
         if (self.type === 'package') {
@@ -64,23 +61,6 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
             return item.id;
         }
     }
-
-    function goPrev() {
-        self.page -= 1;
-        if ($.isEmptyObject(self.selected)) {
-            refreshItems(false);
-        }
-        $ionicScrollDelegate.scrollTop();
-    }
-
-    function goNext() {
-        self.page += 1;
-        if ($.isEmptyObject(self.selected)) {
-            refreshItems(false);
-        }
-        $ionicScrollDelegate.scrollTop();
-    }
-
     function clearTags() {
         for (var key in self.selected) {
             if (self.selected.hasOwnProperty(key)) {
@@ -93,14 +73,12 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
     function addTag(tag) {
         self.selected[tag] = true;
         delete self.unselected[tag];
-        self.page = 1;
         refreshItems(true);
     }
 
     function deleteTag(tag) {
         self.unselected[tag] = true;
         delete self.selected[tag];
-        self.page = 1;
         refreshItems(true);
     }
 
@@ -124,11 +102,11 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
     function refreshItems(tag) {
         if ($.isEmptyObject(self.selected)) {
             database
-            .getMetasPagination(self.type, self.page, self.pageSize)
+            .getMetasPagination(self.type, 1, self.page*self.pageSize)
             .success(function(res) {
                 self.items = res[0];
                 self.hasNext = res[1];
-                refreshItemImgs();
+                refreshItemImgs(0);
                 if (tag) {
                     refreshTags();
                 }
@@ -138,11 +116,11 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
             });
         } else {
             database
-            .getMetasWithTags(self.type, self.page,
-                             self.pageSize, self.selected)
+            .getMetasWithTags(self.type, self.selected)
             .success(function(res) {
                 self.items = res;
-                refreshItemImgs();
+                self.hasNext = false;
+                refreshItemImgs(0);
                 if (tag) {
                     refreshTags();
                 }
@@ -153,14 +131,15 @@ function LocalController($scope, $ionicModal, $ionicScrollDelegate, preference, 
         }
     }
 
-    function refreshItemImgs() {
+    function refreshItemImgs(skip) {
         var idName;
         if (self.type === 'package') {
             idName = 'packageId';
         } else {
             idName = 'id';
         }
-        self.items.forEach(function(item, index) {
+
+        self.items.slice(skip).forEach(function(item, index) {
             database
             .getImg(self.type, item[idName])
             .success(function(img) {

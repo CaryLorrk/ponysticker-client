@@ -10,8 +10,10 @@
     <ion-content class="has-header has-footer">
         <div class="list">
             <a class="item item-thumbnail-left"
-                ng-repeat="pkg in favorite.items"
-                ui-sref="package({repo:'local', packageId: pkg.packageId})">
+                    collection-repeat="pkg in favorite.items"
+                    collection-item-width="'100%'"
+                    collection-item-height="'100px'"
+                    ui-sref="package({repo:'local', packageId: pkg.packageId})">
                 <img ng-src="{{favorite.getItemImgUrl(pkg.packageId)}}" alt="{{pkg.packageId}}">
                 <p>{{pkg.packageId}}</p>
                 <h2>{{package.getTitle(pkg)}}</h2>

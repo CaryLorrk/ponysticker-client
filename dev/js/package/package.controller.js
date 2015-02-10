@@ -28,7 +28,6 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state,
     self.addFavorite = addFavorite;
     self.removeFavorite = removeFavorite;
     self.deletePackage = deletePackage;
-    self.loadMore = loadMore;
     self.showMorePopover = showMorePopover;
     self.showActionSheet = showActionSheet;
 
@@ -41,38 +40,6 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state,
 
     function showMorePopover($event) {
         self.morePopover.show($event);
-    }
-
-    function loadMore() {
-        var step = 6;
-        if (!self.meta) {
-            waitMeta(loadData);
-        } else {
-            loadData();
-        }
-
-        $timeout(function() {
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-        }, 100);
-
-        function waitMeta(fn) {
-            $timeout(function(){
-                if (!self.meta) {
-                    waitMeta(fn);
-                } else {
-                    fn();
-                }
-            }, 100);
-        }
-
-        function loadData() {
-            self.stickers = self.stickers.concat(self.meta.stickers.slice(self.stickerIdx, self.stickerIdx+step));
-            self.stickerIdx += step;
-            if (self.stickerIdx > self.meta.stickers.length) {
-                self.hasMore = false;
-            }
-            
-        }
     }
 
     function deletePackage() {

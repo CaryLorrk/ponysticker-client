@@ -8,13 +8,13 @@
     </ion-nav-buttons>
 
     <ion-content class="has-header has-footer">
-        <div class="thumbnails">
-            <div class="thumbnail" 
-                ng-repeat="sticker in favorite.items"
-                background-src="{{favorite.getItemImgUrl(sticker.id)}}"
-                ng-click="stickerList.showActionSheet(sticker)"
-                touch-active>
-            </div>
+        <div class="item item-avatar thumbnail"
+            collection-repeat="sticker in favorite.items"
+            collection-item-width="'33%'"
+            collection-item-height="'33%'"
+            background-src="{{favorite.getItemImgUrl(sticker.id)}}"
+            ng-click="stickerList.showActionSheet(sticker)"
+            touch-active>
         </div>
     </ion-content>
 </ion-view>

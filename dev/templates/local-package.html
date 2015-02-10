@@ -16,13 +16,21 @@
     <ion-content class="has-header has-subheader has-footer">
         <div class="list">
             <a class="item item-thumbnail-left"
-                ng-repeat="pkg in local.getItems()"
-                ui-sref="package({repo:'local', packageId: pkg.packageId})">
+                    collection-repeat="pkg in local.items"
+                    collection-item-width="'100%'"
+                    collection-item-height="'100px'"
+                    ui-sref="package({repo:'local', packageId: pkg.packageId})">
                 <img ng-src="{{local.getItemImgUrl(pkg.packageId)}}" alt="{{pkg.packageId}}">
                 <p>{{pkg.packageId}}</p>
                 <h2>{{package.getTitle(pkg)}}</h2>
                 <p>{{package.getAuthor(pkg)}}</p>
             </a>
         </div>
+        <ion-infinite-scroll
+            on-infinite="local.loadMore()"
+            ng-if="local.hasNext"
+            distance="10%"
+            immediate-check="true">
+        </ion-infinite-scroll>
     </ion-content>
 </ion-view>

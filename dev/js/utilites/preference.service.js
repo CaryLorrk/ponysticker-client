@@ -11,7 +11,7 @@ function preference() {
     self.setServer = setItemFactory('server');
     self.getServer = getItemFactory('server', 'http://1.34.244.41:50025');
     self.setPageSize = setItemFactory('pageSize');
-    self.getPageSize = getItemFactory('pageSize', 10);
+    self.getPageSize = getItemFactory('pageSize', 12);
     self.setOrder = setItemFactory('order');
     self.getOrder = getItemFactory('order', 'packageId');
     self.setDatabaseVersion = setItemFactory('dbversion');

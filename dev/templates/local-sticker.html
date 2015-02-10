@@ -13,14 +13,23 @@
             ng-click="local.tagModal.show()"></button>
     </ion-nav-buttons>
 
-    <ion-content class="has-header has-subheader has-footer">
-        <div class="thumbnails">
-            <div class="thumbnail" 
-                ng-repeat="sticker in local.getItems()"
-                ng-click="stickerList.showActionSheet(sticker)"
-                background-src="{{local.getItemImgUrl(sticker.id)}}"
-                touch-active>
-            </div>
+    <ion-content class="has-header has-subheader">
+        <div class="item item-avatar thumbnail"
+            collection-repeat="sticker in local.items"
+            collection-item-width="'33%'"
+            collection-item-height="'33%'"
+            background-src="{{local.getItemImgUrl(sticker.id)}}"
+            ng-click="stickerList.showActionSheet(sticker)"
+            touch-active>
         </div>
+        <p class="text-info text-center"
+            ng-if="local.hasNext"
+            translate>LOCAL_SCROLL_FOR_MORE</p>  
+        <ion-infinite-scroll
+            on-infinite="local.loadMore()"
+            ng-if="local.hasNext"
+            distance="10%"
+            immediate-check="true">
+        </ion-infinite-scroll>
     </ion-content>
 </ion-view>

@@ -9,12 +9,9 @@ function FavoriteController($scope, database, preference, type) {
     self.page = 1;
     self.pageSize = preference.getPageSize();
     self.type = type;
-    self.hasNext = false;
     self.items = [];
     self.itemImgs = {};
 
-    self.goPrev = goPrev;
-    self.goNext = goNext;
     self.getItemImgUrl = getItemImgUrl;
 
     init();
@@ -24,16 +21,6 @@ function FavoriteController($scope, database, preference, type) {
             return '';
         }
         return 'data:image/jpg;base64,'+self.itemImgs[itemId];
-    }
-
-    function goPrev() {
-        self.page -= 1;
-        refreshItems();
-    }
-
-    function goNext() {
-        self.page += 1;
-        refreshItems();
     }
 
     function init() {
@@ -49,8 +36,7 @@ function FavoriteController($scope, database, preference, type) {
         database
         .getMetaPaginationByStar(self.type, self.page, self.pageSize)
         .success(function(res) {
-            self.items = res[0];
-            self.hasNext = res[1];
+            self.items = res;
             refreshItemImgs();
         })
         .error(function() {

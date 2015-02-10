@@ -14,7 +14,6 @@
     "DOWNLOAD_ID": "序號",
     "DOWNLOAD_DATE": "日期",
     "DOWNLOAD_RELOAD": "重新載入",
-    "DOWNLOAD_LOADING_ERROR": "糟糕！出了些問題，請重新載入。",
-    "DOWNLOAD_SCROLL_FOR_MORE": "捲動讀取更多"
+    "DOWNLOAD_LOADING_ERROR": "糟糕！出了些問題，請重新載入。"
 
 }

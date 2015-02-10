@@ -7,6 +7,7 @@
     "PACKAGE_SET_TAGS": "Set Tags",
     "PACKAGE_DELETE_TITLE": "Delete",
     "PACKAGE_DELETE_CONTENT": "Deleting will lose all your data of this package. Are you sure?",
+    "PACKAGE_DELETE_CANCEL": "Cancel",
     "PACKAGE_DELETE_CONFIRM": "Confirm",
     "PACKAGE_MORE": "More"
 }
