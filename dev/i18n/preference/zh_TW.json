@@ -5,5 +5,7 @@
     "PREFERENCE_LANGUAGE": "語言",
     "PREFERENCE_SERVER": "伺服器",
     "PREFERENCE_PAGE_SIZE": "頁面大小",
-    "PREFERENCE_SPACE": "空間"
+    "PREFERENCE_SPACE": "空間",
+    "PREFERENCE_IMPORT_ALERT_TITLE": "警告",
+    "PREFERENCE_IMPORT_ALERT_CONTENT": "匯入的過程中出了一些差錯。資料庫設定成功，但資料可能不完整。"
 }

@@ -8,8 +8,8 @@ function LocalStickerController(stickerActionSheet) {
 
     self.showActionSheet = showActionSheet;
 
-    function showActionSheet(sticker) {
-        stickerActionSheet(sticker.id, true);
+    function showActionSheet(sticker, imgBase64) {
+        stickerActionSheet(sticker.id, true, imgBase64);
     }
 }
 }());

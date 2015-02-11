@@ -3,17 +3,49 @@ angular
 .module('ponysticker.preference')
 .controller('PreferenceController', PreferenceController); 
 
-function PreferenceController($ionicHistory, $translate, preference) {
+function PreferenceController($scope, $ionicPopup, $ionicLoading, $ionicHistory, $translate, preference, backup) {
     var self = this;
     self.language = preference.getLanguage();
     self.pageSize = preference.getPageSize();
     self.server = preference.getServer();
+    self.uploaded = null;
 
     self.updateLanguage = updateLanguage;
     self.updatePageSize = updatePageSize;
     self.updateServer = updateServer;
+    self.change = change;
 
     init();
+
+    function change() {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var data = JSON.parse(e.target.result);
+
+            $scope.loading = {};
+            $ionicLoading.show({
+                scope: $scope,
+                templateUrl: 'templates/loading.html'
+            });
+            backup.importData(data, $scope).then(function(hasError) {
+                $ionicLoading.hide();
+                if (hasError) {
+                    $translate([
+                        'PREFERENCE_IMPORT_ALERT_TITLE',
+                        'PREFERENCE_IMPORT_ALERT_CONTENT'
+                    ])
+                    .then(function(trans) {
+                        $ionicPopup.alert({
+                            title: trans.PREFERENCE_IMPORT_ALERT_TITLE,
+                            template: trans.PREFERENCE_IMPORT_ALERT_CONTENT
+                        });
+                    });
+                }
+
+            });
+        };
+        reader.readAsText(self.uploaded[0]);
+    }
 
     function init() {
         getSpace();

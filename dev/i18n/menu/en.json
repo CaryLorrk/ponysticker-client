@@ -8,5 +8,6 @@
     "MENU_CREATOR": "Creator",
     "MENU_CUSTOM": "Custom",
     "MENU_PREFERENCE": "Preference",
-    "MENU_LOCAL_STICKER": "Local Sticker"
+    "MENU_LOCAL_STICKER": "Local Sticker",
+    "MENU_EXIT": "Exit"
 }

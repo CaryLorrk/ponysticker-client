@@ -3,8 +3,8 @@ angular
 .module('ponysticker.utilites')
 .factory('stickerActionSheet', stickerActionSheet);
 
-function stickerActionSheet($ionicActionSheet, $state, $translate, database) {
-    return function showActionSheet(sticker, jump) {
+function stickerActionSheet($rootScope, $ionicActionSheet, $state, $translate, database) {
+    return function showActionSheet(sticker, jump, imgBase64) {
         $translate([
             'UTILITES_SET_TAGS',
             'UTILITES_CANCEL',
@@ -37,6 +37,7 @@ function stickerActionSheet($ionicActionSheet, $state, $translate, database) {
                     buttonClicked: function(index) {
                         switch(index) {
                             case 0:
+                                actionSheetShare(meta, imgBase64);
                                 break;
                             case 1:
                                 actionSheetFavorite(meta);
@@ -56,6 +57,21 @@ function stickerActionSheet($ionicActionSheet, $state, $translate, database) {
             });
         });
     };
+
+    function actionSheetShare(meta, imgBase64) {
+        if (meta) {
+            meta.recent = Date.now();
+            database
+            .updateMeta('sticker', meta);
+        }
+        if ($rootScope.intentType === 'main') {
+            window.PonyPlugin.shareWithBase64(imgBase64);
+        } else if ($rootScope.intentType === 'browser') {
+
+        } else {
+            window.PonyPlugin.setResultWithBase64(imgBase64);
+        }
+    }
 
     function actionSheetFavorite(meta) {
         if (meta.star === 0) {

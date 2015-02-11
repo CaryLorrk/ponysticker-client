@@ -8,5 +8,6 @@
     "MENU_CREATOR": "個人原創貼圖",
     "MENU_CUSTOM": "客製貼圖",
     "MENU_PREFERENCE": "偏好設定",
-    "MENU_LOCAL_STICKER": "本機貼圖"
+    "MENU_LOCAL_STICKER": "本機貼圖",
+    "MENU_EXIT": "離開"
 }

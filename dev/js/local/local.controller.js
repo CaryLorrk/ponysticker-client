@@ -74,6 +74,9 @@ function LocalController($scope, $timeout, $ionicModal, $ionicScrollDelegate, pr
         self.selected[tag] = true;
         delete self.unselected[tag];
         refreshItems(true);
+        $ionicScrollDelegate
+        .$getByHandle('modalContent')
+        .scrollTop(true);
     }
 
     function deleteTag(tag) {
@@ -100,6 +103,9 @@ function LocalController($scope, $timeout, $ionicModal, $ionicScrollDelegate, pr
     }
 
     function refreshItems(tag) {
+        $ionicScrollDelegate
+        .$getByHandle('mainContent')
+        .scrollTop(true);
         if ($.isEmptyObject(self.selected)) {
             database
             .getMetasPagination(self.type, 1, self.page*self.pageSize)

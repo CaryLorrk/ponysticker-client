@@ -236,7 +236,6 @@ function database($q, $timeout) {
             };
         });
         return buildPromise(deferred.promise);
-
     }
 
     function getClassifiedTags(type, id) {
@@ -463,8 +462,10 @@ function database($q, $timeout) {
                 'packageImg', 'stickerImg'], 'readwrite');
             var pkgObjStore = transaction.objectStore('package');
             var pkgImgObjStore = transaction.objectStore('packageImg');
-            meta.date = (new Date()).getTime();
-            meta.star = 0;
+            meta.date = Date.now();
+            if (meta.star === undefined) {
+                meta.star = 0;
+            }
             pkgObjStore.add(meta);
             pkgImgObjStore.add({packageId: meta.packageId, base64: tabOnBase64});
 

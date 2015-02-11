@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="me.carylorrk.ponysticker.plugin"
+    version="1.0.0">
+    <name>PonyPlugin</name>
+    <description>Cordova PonyPlugin Plugin</description>
+  <license>Beerware</license>
+
+    <js-module src="www/PonyPlugin.js" name="PonyPlugin">
+        <clobbers target="PonyPlugin" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="PonyPlugin" >
+                <param name="android-package" value="me.carylorrk.ponysticker.plugin.PonyPlugin"/>
+            </feature>
+        </config-file>
+        
+        <!--permission-->
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+        </config-file>
+
+        <!--intent-filter-->
+        <config-file target="AndroidManifest.xml" parent="/manifest/application/activity">
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </config-file>
+
+        <source-file src="src/android/PonyPlugin.java" target-dir="src/me/carylorrk/ponysticker/plugin" />
+    </platform>
+</plugin>

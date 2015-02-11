@@ -14,8 +14,12 @@
             <!--Export/Import-->
             <ion-item>
                 <div class="button-bar">
-                    <a class="button button-positive" translate>PREFERENCE_EXPORT</a>
-                    <a class="button button-assertive" translate>PREFERENCE_IMPORT</a>
+                    <button class="button button-positive" translate>PREFERENCE_EXPORT</button>
+                    <button class="button button-assertive"
+                        ng-file-select
+                        ng-model="preference.uploaded"
+                        ng-file-change="preference.change()"
+                        translate>PREFERENCE_IMPORT</button>
                 </div>
             </ion-item>
 

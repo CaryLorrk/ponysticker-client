@@ -3,6 +3,7 @@ angular
 .module('ponysticker',[
     'ionic',
     'pascalprecht.translate',
+    'angularFileUpload',
     'ponysticker.utilites',
     'ponysticker.menu',
     'ponysticker.favorite',
@@ -30,8 +31,17 @@ function config($ionicConfigProvider, $translateProvider, $urlRouterProvider) {
 
 }
 
-function run($ionicPlatform, $translate, preference, database) {
+function run($rootScope, $ionicPlatform, $translate, preference, database) {
     $ionicPlatform.ready(function() {
+        if (ionic.Platform.isWebView()) {
+            $rootScope.intentType = 'main';
+            window.PonyPlugin.checkIntent(function(res) {
+                $rootScope.intentType = res;
+                console.log(res);
+            });
+        } else {
+            $rootScope.intentType = 'browser';
+        }
         database.init();
     });
     $translate.use(preference.getLanguage());

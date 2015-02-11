@@ -13,7 +13,8 @@
             ng-click="local.tagModal.show()"></button>
     </ion-nav-buttons>
 
-    <ion-content class="has-header has-subheader has-footer">
+    <ion-content delegate-handle="mainContent"
+        class="has-header has-subheader">
         <div class="list">
             <a class="item item-thumbnail-left"
                     collection-repeat="pkg in local.items"
@@ -26,6 +27,9 @@
                 <p>{{package.getAuthor(pkg)}}</p>
             </a>
         </div>
+        <p class="text-info text-center"
+            ng-if="local.hasNext"
+            translate>LOCAL_SCROLL_FOR_MORE</p>  
         <ion-infinite-scroll
             on-infinite="local.loadMore()"
             ng-if="local.hasNext"

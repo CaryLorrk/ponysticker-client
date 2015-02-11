@@ -9,6 +9,13 @@ function MenuController() {
     self.submenu = '';
     self.toggleSubmenu = toggleSubmenu;
     self.showSubmenu = showSubmenu;
+    self.exitApp = exitApp;
+    self.isWebView = ionic.Platform.isWebView;
+
+    function exitApp() {
+        window.close();
+        ionic.Platform.exitApp();
+    }
 
     function toggleSubmenu(submenu) {
         if (self.submenu !== submenu) {

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="me.carylorrk.ponysticker" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>ponysticker</name>
+  <name>PonySticker</name>
   <description>
-        An Ionic Framework and Cordova project.
+      A sticker manager.
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
-    </author>
+  <author email="carylorrk@gmail.com" href="http://carylorrk.github.io/">
+      CaryLorrk
+  </author>
   <content src="index.html"/>
   <access origin="*"/>
   <preference name="webviewbounce" value="false"/>

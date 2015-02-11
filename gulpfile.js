@@ -19,6 +19,7 @@ gulp.task('js', function() {
         'dev/lib/ionic/js/ionic.bundle.js',
         'dev/lib/angular-translate/*.js',
         'dev/lib/angular-translate-loader-partial/*.js',
+        'dev/lib/angular-file-upload/angular-file-upload.js',
         'dev/lib/indexedDBshim/IndexedDBShim.js',
         'dev/lib/**/*.js',
         'dev/js/utilites.js',
@@ -27,8 +28,8 @@ gulp.task('js', function() {
         'dev/js/**/*.js'])
             .pipe(plumber())
             .pipe(concat('ponysticker.concat.js'))
-            .pipe(ngAnnotate())
-            .pipe(uglify())
+            //.pipe(ngAnnotate())
+            //.pipe(uglify())
             .pipe(rename('ponysticker.min.js'))
             .pipe(gulp.dest('www/js'));
 });
@@ -45,8 +46,8 @@ gulp.task('res', function() {
 
 gulp.task('html', function() {
     gulp.src(['dev/**/*.html'])
-    .pipe(ngHtmlify())
-    .pipe(minifyHtml({empty: true}))
+    //.pipe(ngHtmlify()
+    //.pipe(minifyHtml({empty: true}))
     .pipe(gulp.dest('www'));
 });
 

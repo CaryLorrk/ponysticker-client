@@ -34,7 +34,10 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state,
     init();
 
     function showActionSheet(sticker) {
-        stickerActionSheet(sticker);
+        if (self.remote) {
+            sticker = null;
+        }
+        stickerActionSheet(sticker, false, self.stickersBase64[sticker]);
     }
 
 
@@ -133,7 +136,6 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state,
                 }
             }, 500);
         }
-
     }
 
     function getStickerUrl(sticker) {

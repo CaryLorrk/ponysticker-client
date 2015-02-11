@@ -5,5 +5,7 @@
     "PREFERENCE_LANGUAGE": "Language",
     "PREFERENCE_SERVER": "Server",
     "PREFERENCE_PAGE_SIZE": "Page Size",
-    "PREFERENCE_SPACE": "Space"
+    "PREFERENCE_SPACE": "Space",
+    "PREFERENCE_IMPORT_ALERT_TITLE": "Alert",
+    "PREFERENCE_IMPORT_ALERT_CONTENT": "There are some problem during importing. Database startup successful, but it may be incomplete."
 }

@@ -13,14 +13,16 @@
             ng-click="local.tagModal.show()"></button>
     </ion-nav-buttons>
 
-    <ion-content class="has-header has-subheader">
+    <ion-content delegate-handle="mainContent"
+        class="has-header has-subheader">
         <div class="item item-avatar thumbnail"
             collection-repeat="sticker in local.items"
             collection-item-width="'33%'"
             collection-item-height="'33%'"
             background-src="{{local.getItemImgUrl(sticker.id)}}"
-            ng-click="stickerList.showActionSheet(sticker)"
+            ng-click="stickerList.showActionSheet(sticker, local.itemImgs[sticker.id])"
             touch-active>
+            {{sticker.recent}}
         </div>
         <p class="text-info text-center"
             ng-if="local.hasNext"

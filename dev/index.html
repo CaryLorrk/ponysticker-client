@@ -126,6 +126,14 @@
                                 MENU_PREFERENCE
                             </span>
                         </ion-item>
+
+                        <ion-item nav-clear menu-close
+                            ng-click="menu.exitApp()"
+                            ng-if="menu.isWebView()">
+                            <span translate>
+                                MENU_EXIT
+                            </span>
+                        </ion-item>
                     </ion-list>
                 </ion-content>
             </ion-side-menu>
