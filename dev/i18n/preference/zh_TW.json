@@ -6,8 +6,12 @@
     "PREFERENCE_SERVER": "伺服器",
     "PREFERENCE_PAGE_SIZE": "頁面大小",
     "PREFERENCE_SPACE": "空間",
+    "PREFERENCE_IMPORT_ERROR_TITLE": "錯誤",
+    "PREFERENCE_IMPORT_ERROR_CONTENT": "匯入的過程中出了一些差錯。資料庫設定成功，但資料可能不完整。",
     "PREFERENCE_IMPORT_ALERT_TITLE": "警告",
-    "PREFERENCE_IMPORT_ALERT_CONTENT": "匯入的過程中出了一些差錯。資料庫設定成功，但資料可能不完整。",
+    "PREFERENCE_IMPORT_ALERT_CONTENT": "匯入資料可能需要大量時間與網路流量。要繼續嗎？",
+    "PREFERENCE_EXPORT_ERROR_TITLE": "錯誤",
+    "PREFERENCE_EXPORT_ERROR_CONTENT": "匯出失敗",
     "PREFERENCE_EXPORT_ALERT_TITLE": "警告",
-    "PREFERENCE_EXPORT_ALERT_CONTENT": "匯出失敗"
+    "PREFERENCE_EXPORT_ALERT_CONTENT": "將資料匯出至 Google Drive 將耗費些許時間與網路流量。要繼續嗎？"
 }

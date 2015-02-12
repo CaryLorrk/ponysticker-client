@@ -20,82 +20,116 @@ function PreferenceController($scope, $ionicPopup, $ionicLoading, $ionicHistory,
     init();
 
     function exportData() {
-        googledrive
-        .auth()
-        .then(function() {
-            $scope.loading = {};
-            $ionicLoading.show({
-                scope: $scope,
-                templateUrl: 'templates/loading.html'
-            });
-            backup.exportData()
-            .then(function(data) {
-                var date = new Date();
-                var filename = 'database-'+ date.getFullYear() + '-' +
-                    (date.getMonth()+1) + '-' +
-                    date.getDate() + '-' +
-                    date.getHours() + '.' +
-                    date.getMinutes() + '.' +
-                    date.getSeconds() + '.json';
-                googledrive.uploadJson(filename, data, function(file) {
-                    $ionicLoading.hide();
-                    if(!file.title) {
-                        showExportFail();
-                    }
-                });
-
-            }, function() {
-                $ionicLoading.hide();
-                showExportFail();
-            });
-        }, function(error) {
-            //TODO
-        });
-    }
-
-    function showExportFail() {
         $translate([
             'PREFERENCE_EXPORT_ALERT_TITLE',
             'PREFERENCE_EXPORT_ALERT_CONTENT'
         ])
         .then(function(trans) {
-            $ionicPopup.alert({
+            $ionicPopup.confirm({
                 title: trans.PREFERENCE_EXPORT_ALERT_TITLE,
                 template: trans.PREFERENCE_EXPORT_ALERT_CONTENT
+            })
+            .then(function(res) {
+                if (res) {
+                    process();
+                }
+            });
+        });
+        function process() {
+            googledrive
+            .auth()
+            .then(function() {
+                $scope.loading = {};
+                $ionicLoading.show({
+                    scope: $scope,
+                    templateUrl: 'templates/loading.html'
+                });
+                backup.exportData()
+                .then(function(data) {
+                    var date = new Date();
+                    var filename = 'database-'+ date.getFullYear() + '-' +
+                        (date.getMonth()+1) + '-' +
+                        date.getDate() + '-' +
+                        date.getHours() + '.' +
+                        date.getMinutes() + '.' +
+                        date.getSeconds() + '.json';
+                    googledrive.uploadJson(filename, data, function(file) {
+                        $ionicLoading.hide();
+                        if(!file.title) {
+                            showExportFail();
+                        }
+                    });
+
+                }, function() {
+                    $ionicLoading.hide();
+                    showExportFail();
+                });
+            }, function(error) {
+                showExportFail();
+            });
+        }
+    }
+
+    function showExportFail() {
+        $translate([
+            'PREFERENCE_EXPORT_ERROR_TITLE',
+            'PREFERENCE_EXPORT_ERROR_CONTENT'
+        ])
+        .then(function(trans) {
+            $ionicPopup.alert({
+                title: trans.PREFERENCE_EXPORT_ERROR_TITLE,
+                template: trans.PREFERENCE_EXPORT_ERROR_CONTENT
             });
         });
     }
 
 
     function change() {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var data = JSON.parse(e.target.result);
-
-            $scope.loading = {};
-            $ionicLoading.show({
-                scope: $scope,
-                templateUrl: 'templates/loading.html'
-            });
-            backup.importData(data, $scope)
-            .then(function(hasError) {
-                $ionicLoading.hide();
-                if (hasError) {
-                    $translate([
-                        'PREFERENCE_IMPORT_ALERT_TITLE',
-                        'PREFERENCE_IMPORT_ALERT_CONTENT'
-                    ])
-                    .then(function(trans) {
-                        $ionicPopup.alert({
-                            title: trans.PREFERENCE_IMPORT_ALERT_TITLE,
-                            template: trans.PREFERENCE_IMPORT_ALERT_CONTENT
-                        });
-                    });
+        $translate([
+            'PREFERENCE_IMPORT_ALERT_TITLE',
+            'PREFERENCE_IMPORT_ALERT_CONTENT'
+        ])
+        .then(function(trans) {
+            $ionicPopup.confirm({
+                title: trans.PREFERENCE_IMPORT_ALERT_TITLE,
+                template: trans.PREFERENCE_IMPORT_ALERT_CONTENT
+            })
+            .then(function() {
+                if (res) {
+                    process();
                 }
-
             });
-        };
-        reader.readAsText(self.uploaded[0]);
+        });
+        function process() {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = JSON.parse(e.target.result);
+
+                $scope.loading = {};
+                $ionicLoading.show({
+                    scope: $scope,
+                    templateUrl: 'templates/loading.html'
+                });
+                backup.importData(data, $scope)
+                .then(function(hasError) {
+                    $ionicLoading.hide();
+                    if (hasError) {
+                        $translate([
+                            'PREFERENCE_IMPORT_ERROR_TITLE',
+                            'PREFERENCE_IMPORT_ERROR_CONTENT'
+                        ])
+                        .then(function(trans) {
+                            $ionicPopup.alert({
+                                title: trans.PREFERENCE_IMPORT_ERROR_TITLE,
+                                template: trans.PREFERENCE_IMPORT_ERROR_CONTENT
+                            });
+                        });
+                    }
+
+                });
+            };
+            reader.readAsText(self.uploaded[0]);
+        }
     }
 
     function init() {

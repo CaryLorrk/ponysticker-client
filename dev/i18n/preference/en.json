@@ -6,8 +6,12 @@
     "PREFERENCE_SERVER": "Server",
     "PREFERENCE_PAGE_SIZE": "Page Size",
     "PREFERENCE_SPACE": "Space",
+    "PREFERENCE_IMPORT_ERROR_TITLE": "Error",
+    "PREFERENCE_IMPORT_ERROR_CONTENT": "There are some problem during importing. Database startup successful, but it may be incomplete.",
     "PREFERENCE_IMPORT_ALERT_TITLE": "Alert",
-    "PREFERENCE_IMPORT_ALERT_CONTENT": "There are some problem during importing. Database startup successful, but it may be incomplete.",
+    "PREFERENCE_IMPORT_ALERT_CONTENT": "Importing data  need a lot of time and network. Continue?",
+    "PREFERENCE_EXPORT_ERROR_TITLE": "Error",
+    "PREFERENCE_EXPORT_ERROR_CONTENT": "Failed to export",
     "PREFERENCE_EXPORT_ALERT_TITLE": "Alert",
-    "PREFERENCE_EXPORT_ALERT_CONTENT": "Failed to export"
+    "PREFERENCE_EXPORT_ALERT_CONTENT": "Exporting data to Google Drive need some time and network. Continue?"
 }
