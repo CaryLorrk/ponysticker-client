@@ -94,7 +94,7 @@ function PreferenceController($scope, $ionicPopup, $ionicLoading, $ionicHistory,
                 title: trans.PREFERENCE_IMPORT_ALERT_TITLE,
                 template: trans.PREFERENCE_IMPORT_ALERT_CONTENT
             })
-            .then(function() {
+            .then(function(res) {
                 if (res) {
                     process();
                 }
