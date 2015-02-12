@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="me.carylorrk.ponysticker" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="me.carylorrk.ponysticker" version="0.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>PonySticker</name>
   <description>
       A sticker manager.
@@ -16,4 +16,9 @@
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
+
+  <icon src="res/icons/android/icon-36-ldpi.png" platform="android" density="ldpi" />
+  <icon src="res/icons/android/icon-48-mdpi.png" platform="android" density="mdpi" />
+  <icon src="res/icons/android/icon-72-hdpi.png" platform="android" density="hdpi" />
+  <icon src="res/icons/android/icon-96-xhdpi.png" platform="android" density="xhdpi" />
 </widget>

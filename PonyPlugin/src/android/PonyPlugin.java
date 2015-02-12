@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.R;
 import android.util.Base64;
 import android.net.Uri;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CordovaActivity;
@@ -109,7 +111,7 @@ public class PonyPlugin extends CordovaPlugin {
     private String saveBase64(final String imgBase64) throws Exception {
         final String dirName = webView.getContext().getExternalFilesDir(null) + "/ponysticker";
         createDir(dirName);
-        String fileName = "file.jpg";
+        String fileName = sha1(imgBase64)+".jpg";
         saveFile(Base64.decode(imgBase64, Base64.DEFAULT), dirName, fileName);
         String url = "file://" + dirName + "/" + fileName;
         return url;
@@ -124,11 +126,29 @@ public class PonyPlugin extends CordovaPlugin {
         }
     }
 
+    private String sha1(String input) throws NoSuchAlgorithmException {
+        MessageDigest mDigest = MessageDigest.getInstance("SHA1");
+        byte[] result = mDigest.digest(input.getBytes());
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < result.length; i++) {
+            sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
+        }
+         
+        return sb.toString();
+    }
+
     private void saveFile(byte[] bytes, String dirName, String fileName) throws Exception {
         final File dir = new File(dirName);
+        cleanupOldFiles(dir);
         final FileOutputStream fos = new FileOutputStream(new File(dir, fileName));
         fos.write(bytes);
         fos.flush();
         fos.close();
+    }
+
+    private void cleanupOldFiles(File dir) {
+        for (File f : dir.listFiles()) {
+            f.delete();
+        }
     }
 }

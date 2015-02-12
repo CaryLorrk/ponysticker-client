@@ -97,7 +97,7 @@ function DownloadController($scope, $state,
         }
 
         function isInRange() {
-            return self.pageEditor.newPage < self.getPageCount();
+            return self.pageEditor.newPage <= self.getPageCount();
         }
 
         function isLegal() {

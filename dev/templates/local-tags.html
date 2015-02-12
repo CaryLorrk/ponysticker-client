@@ -41,20 +41,20 @@
             <div class="item item-divider" translate>
                 TAGS_UNSELECTED
             </div>
-            <a class="item item-icon-right"
-                collection-repeat="tag in local.getKeys(local.unselected) | filter:local.query"
-                collection-item-width="'100%'"
-                collection-item-height="'54px'"
-                ng-click="local.addTag(tag)">
-                {{tag}}
-                <i class="icon ion-plus-circled text-info"></i>
-            </a>
-            <!--<a class="item item-icon-right animation-flip"-->
-                <!--ng-repeat="tag in local.getKeys(local.unselected) | filter:local.query"-->
+            <!--<a class="item item-icon-right"-->
+                <!--collection-repeat="tag in local.getKeys(local.unselected) | filter:local.query"-->
+                <!--collection-item-width="'100%'"-->
+                <!--collection-item-height="'54px'"-->
                 <!--ng-click="local.addTag(tag)">-->
                 <!--{{tag}}-->
                 <!--<i class="icon ion-plus-circled text-info"></i>-->
             <!--</a>-->
+            <a class="item item-icon-right animation-flip"
+                ng-repeat="tag in local.getKeys(local.unselected) | filter:local.query"
+                ng-click="local.addTag(tag)">
+                {{tag}}
+                <i class="icon ion-plus-circled text-info"></i>
+            </a>
         </div>
     </ion-content>
 </ion-modal-view>
