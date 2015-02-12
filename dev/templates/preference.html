@@ -14,7 +14,9 @@
             <!--Export/Import-->
             <ion-item>
                 <div class="button-bar">
-                    <button class="button button-positive" translate>PREFERENCE_EXPORT</button>
+                    <button class="button button-positive"
+                        ng-click="preference.exportData()"
+                        translate>PREFERENCE_EXPORT</button>
                     <button class="button button-assertive"
                         ng-file-select
                         ng-model="preference.uploaded"

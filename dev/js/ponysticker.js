@@ -2,6 +2,7 @@
 angular
 .module('ponysticker',[
     'ionic',
+    'ngCordova',
     'pascalprecht.translate',
     'angularFileUpload',
     'ponysticker.utilites',
@@ -37,7 +38,6 @@ function run($rootScope, $ionicPlatform, $translate, preference, database) {
             $rootScope.intentType = 'main';
             window.PonyPlugin.checkIntent(function(res) {
                 $rootScope.intentType = res;
-                console.log(res);
             });
         } else {
             $rootScope.intentType = 'browser';

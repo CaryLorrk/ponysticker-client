@@ -9,5 +9,8 @@
     "PACKAGE_DELETE_CONTENT": "Deleting will lose all your data of this package. Are you sure?",
     "PACKAGE_DELETE_CANCEL": "Cancel",
     "PACKAGE_DELETE_CONFIRM": "Confirm",
-    "PACKAGE_MORE": "More"
+    "PACKAGE_MORE": "More",
+    "PACKAGE_EXPORT": "Export",
+    "PACKAGE_EXPORT_ALERT_TITLE": "Alert",
+    "PACKAGE_EXPORT_ALERT_CONTENT": "Failed to export"
 }

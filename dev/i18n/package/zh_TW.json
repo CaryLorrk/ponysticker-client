@@ -9,5 +9,8 @@
     "PACKAGE_DELETE_CONTENT": "刪除將會遺失所有關於此貼圖包的資料。你確定嗎？",
     "PACKAGE_DELETE_CANCEL": "取消",
     "PACKAGE_DELETE_CONFIRM": "確認",
-    "PACKAGE_MORE": "更多設定"
+    "PACKAGE_MORE": "更多設定",
+    "PACKAGE_EXPORT": "匯出",
+    "PACKAGE_EXPORT_ALERT_TITLE": "警告",
+    "PACKAGE_EXPORT_ALERT_CONTENT": "匯出失敗"
 }

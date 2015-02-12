@@ -13,15 +13,25 @@ var ngAnnotate = require('gulp-ng-annotate');
 
 var minifyCss = require('gulp-minify-css');
 
-gulp.task('js', function() {
+gulp.task('jslib', function() {
     return gulp.src([
         'dev/lib/jquery/jquery-1.11.2.js',
         'dev/lib/ionic/js/ionic.bundle.js',
+        'dev/lib/ng-cordova/ng-cordova.js',
         'dev/lib/angular-translate/*.js',
         'dev/lib/angular-translate-loader-partial/*.js',
         'dev/lib/angular-file-upload/angular-file-upload.js',
-        'dev/lib/indexedDBshim/IndexedDBShim.js',
-        'dev/lib/**/*.js',
+        'dev/lib/indexedDBshim/IndexedDBShim.js'])
+        .pipe(plumber())
+        .pipe(concat('ponysticker.lib.concat.js'))
+        //.pipe(ngAnnotate())
+        //.pipe(uglify())
+        .pipe(rename('ponysticker.lib.min.js'))
+        .pipe(gulp.dest('www/js'));
+});
+
+gulp.task('js', function() {
+    return gulp.src([
         'dev/js/utilites.js',
         'dev/js/ponysticker.js',
         'dev/js/*/module.js',
@@ -65,12 +75,15 @@ gulp.task('clean', function(cb) {
 }); 
 
 gulp.task('default', ['clean'], function() {
-    gulp.start('js', 'html', 'css', 'i18n', 'res');
+    gulp.start('js', 'html', 'css', 'i18n', 'res', 'jslib');
 });
 
 gulp.task('watch', ['default'], function() {
-    watch('dev/**/*.js', function() {
+    watch('dev/js/**/*.js', function() {
         gulp.start('js');
+    });
+    watch('dev/lib/**/*.js', function() {
+        gulp.start('jslib');
     });
     watch('dev/**/*.html', function() {
         gulp.start('html');

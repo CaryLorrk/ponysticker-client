@@ -16,6 +16,24 @@ function preference() {
     self.getOrder = getItemFactory('order', 'packageId');
     self.setDatabaseVersion = setItemFactory('dbversion');
     self.getDatabaseVersion = getItemFactory('dbversion', 0);
+    self.setDriveToken = setObjectItemFactory('driveToken');
+    self.getDriveToken = getObjectItemFactory('driveToken', null);
+
+    function getObjectItemFactory(item, defaultValue) {
+        return function() {
+            var value = JSON.parse(localStorage.getItem(item));
+            if (!value) {
+                value = defaultValue;
+            }
+            return value;
+        };
+    }
+
+    function setObjectItemFactory(item) {
+        return function(object)  {
+            localStorage.setItem(item, JSON.stringify(object));
+        };
+    }
 
     function setItemFactory(item) {
         return function(value) {

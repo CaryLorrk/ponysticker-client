@@ -344,7 +344,8 @@ function database($q, $timeout) {
             var transaction =
                 self.db.transaction([
                 'package', 'sticker',
-                'packageTag', 'stickerTag'], 'readwrite');
+                'packageTag', 'stickerTag',
+                'packageImg', 'stickerImg'], 'readwrite');
 
             var pkgObjStore = transaction.objectStore('package');
             var stickerObjStore = transaction.objectStore('sticker');

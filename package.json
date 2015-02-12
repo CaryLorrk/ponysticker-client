@@ -22,6 +22,7 @@
     "plugin",
     "ponysticker-plugin",
     "https://git-wip-us.apache.org/repos/asf/cordova-plugin-device.git",
-    "PonyPlugin/"
+    "PonyPlugin/",
+    "https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git"
   ]
 }

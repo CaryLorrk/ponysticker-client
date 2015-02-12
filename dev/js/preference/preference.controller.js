@@ -3,7 +3,8 @@ angular
 .module('ponysticker.preference')
 .controller('PreferenceController', PreferenceController); 
 
-function PreferenceController($scope, $ionicPopup, $ionicLoading, $ionicHistory, $translate, preference, backup) {
+function PreferenceController($scope, $ionicPopup, $ionicLoading, $ionicHistory,
+                              $translate, preference, backup, googledrive) {
     var self = this;
     self.language = preference.getLanguage();
     self.pageSize = preference.getPageSize();
@@ -14,8 +15,57 @@ function PreferenceController($scope, $ionicPopup, $ionicLoading, $ionicHistory,
     self.updatePageSize = updatePageSize;
     self.updateServer = updateServer;
     self.change = change;
+    self.exportData = exportData;
 
     init();
+
+    function exportData() {
+        googledrive
+        .auth()
+        .then(function() {
+            $scope.loading = {};
+            $ionicLoading.show({
+                scope: $scope,
+                templateUrl: 'templates/loading.html'
+            });
+            backup.exportData()
+            .then(function(data) {
+                var date = new Date();
+                var filename = 'database-'+ date.getFullYear() + '-' +
+                    (date.getMonth()+1) + '-' +
+                    date.getDate() + '-' +
+                    date.getHours() + '.' +
+                    date.getMinutes() + '.' +
+                    date.getSeconds() + '.json';
+                googledrive.uploadJson(filename, data, function(file) {
+                    $ionicLoading.hide();
+                    if(!file.title) {
+                        showExportFail();
+                    }
+                });
+
+            }, function() {
+                $ionicLoading.hide();
+                showExportFail();
+            });
+        }, function(error) {
+            //TODO
+        });
+    }
+
+    function showExportFail() {
+        $translate([
+            'PREFERENCE_EXPORT_ALERT_TITLE',
+            'PREFERENCE_EXPORT_ALERT_CONTENT'
+        ])
+        .then(function(trans) {
+            $ionicPopup.alert({
+                title: trans.PREFERENCE_EXPORT_ALERT_TITLE,
+                template: trans.PREFERENCE_EXPORT_ALERT_CONTENT
+            });
+        });
+    }
+
 
     function change() {
         var reader = new FileReader();
@@ -27,7 +77,8 @@ function PreferenceController($scope, $ionicPopup, $ionicLoading, $ionicHistory,
                 scope: $scope,
                 templateUrl: 'templates/loading.html'
             });
-            backup.importData(data, $scope).then(function(hasError) {
+            backup.importData(data, $scope)
+            .then(function(hasError) {
                 $ionicLoading.hide();
                 if (hasError) {
                     $translate([

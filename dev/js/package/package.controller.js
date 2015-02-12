@@ -3,8 +3,9 @@ angular
 .module('ponysticker.package')
 .controller('PackageController', PackageController);
 
-function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state, 
-                           $translate, stickerActionSheet, preference, serverAPI, database, repo, packageId) {
+function PackageController($scope, $timeout, $ionicLoading, $ionicPopup, $ionicPopover, $state, 
+                           $translate, stickerActionSheet, preference, googledrive,
+                           backup, serverAPI, database, repo, packageId) {
     var self = this;
     var prefixDataURI = 'data:image/jpg;base64,';
     self.repo = repo;
@@ -30,14 +31,61 @@ function PackageController($scope, $timeout, $ionicPopup, $ionicPopover, $state,
     self.deletePackage = deletePackage;
     self.showMorePopover = showMorePopover;
     self.showActionSheet = showActionSheet;
+    self.exportPackage = exportPackage;
 
     init();
 
+    function exportPackage() {
+        self.morePopover.hide();
+        googledrive
+        .auth()
+        .then(function() {
+            $scope.loading = {};
+            $ionicLoading.show({
+                scope: $scope,
+                templateUrl: 'templates/loading.html'
+            });
+            backup.exportPackage(self.packageId)
+            .then(function(data) {
+                var date = new Date();
+                var filename = 'package'+ self.packageId +'-'+
+                    date.getFullYear() + '-' +
+                    (date.getMonth()+1) + '-' +
+                    date.getDate() + '-' +
+                    date.getHours() + '.' +
+                    date.getMinutes() + '.' +
+                    date.getSeconds() + '.json';
+                googledrive.uploadJson(filename, data, function(file) {
+                    $ionicLoading.hide();
+                    if(!file.title) {
+                        showExportFail();
+                    }
+                });
+
+            }, function() {
+                showExportFail();
+            });
+        }, function(error) {
+            showExportFail();
+        });
+        
+    }
+
+    function showExportFail() {
+        $translate([
+            'PACKAGE_EXPORT_ALERT_TITLE',
+            'PACKAGE_EXPORT_ALERT_CONTENT'
+        ])
+        .then(function(trans) {
+            $ionicPopup.alert({
+                title: trans.PREFERENCE_EXPORT_ALERT_TITLE,
+                template: trans.PREFERENCE_EXPORT_ALERT_CONTENT
+            });
+        });
+    }
+
     function showActionSheet(sticker) {
-        if (self.remote) {
-            sticker = null;
-        }
-        stickerActionSheet(sticker, false, self.stickersBase64[sticker]);
+        stickerActionSheet(sticker, false, self.stickersBase64[sticker], self.remote);
     }
 
 

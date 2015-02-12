@@ -4,7 +4,7 @@ angular
 .factory('stickerActionSheet', stickerActionSheet);
 
 function stickerActionSheet($rootScope, $ionicActionSheet, $state, $translate, database) {
-    return function showActionSheet(sticker, jump, imgBase64) {
+    return function showActionSheet(sticker, jump, imgBase64, remote) {
         $translate([
             'UTILITES_SET_TAGS',
             'UTILITES_CANCEL',
@@ -37,7 +37,7 @@ function stickerActionSheet($rootScope, $ionicActionSheet, $state, $translate, d
                     buttonClicked: function(index) {
                         switch(index) {
                             case 0:
-                                actionSheetShare(meta, imgBase64);
+                                actionSheetShare(meta, imgBase64, remote);
                                 break;
                             case 1:
                                 actionSheetFavorite(meta);
@@ -58,8 +58,8 @@ function stickerActionSheet($rootScope, $ionicActionSheet, $state, $translate, d
         });
     };
 
-    function actionSheetShare(meta, imgBase64) {
-        if (meta) {
+    function actionSheetShare(meta, imgBase64, remote) {
+        if (!remote) {
             meta.recent = Date.now();
             database
             .updateMeta('sticker', meta);
@@ -67,7 +67,7 @@ function stickerActionSheet($rootScope, $ionicActionSheet, $state, $translate, d
         if ($rootScope.intentType === 'main') {
             window.PonyPlugin.shareWithBase64(imgBase64);
         } else if ($rootScope.intentType === 'browser') {
-
+            window.open('data:image/jpg;base64,'+imgBase64,'_blank');
         } else {
             window.PonyPlugin.setResultWithBase64(imgBase64);
         }
