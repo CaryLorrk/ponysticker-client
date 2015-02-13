@@ -18,9 +18,6 @@
   "cordovaPlugins": [
     "./engine/cordova-crosswalk-engine-c0.5",
     "https://github.com/brodysoft/Cordova-SQLitePlugin",
-    "ponysticker-plugin/",
-    "plugin",
-    "ponysticker-plugin",
     "https://git-wip-us.apache.org/repos/asf/cordova-plugin-device.git",
     "PonyPlugin/",
     "https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git"
